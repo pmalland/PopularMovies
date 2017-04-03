@@ -1,3 +1,22 @@
 <resources>
+    <!--Use throughout Popular Movies-->
+
     <string name="app_name">Popular Movies</string>
+
+
+    <string name="sort">Sort</string>
+    <!--Used in the action bar-->
+
+    <string name="action_sort">Sort by</string>
+    <string name="action_popular">Popularity</string>
+    <string name="action_rate">Rate</string>
+
+    <!--Toast Message -->
+    <string name="toast_sort">Sort clicked</string>
+
+    <!--Used in NetworkUtils-->
+    <string name="themoviedb_base_url">http://api.themoviedb.org/3</string>
+
+    <!--An error message-->
+    <string name="error_message">Something is wrong here</string>
 </resources>
