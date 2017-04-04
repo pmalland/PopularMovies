@@ -27,7 +27,7 @@ public class NetworkUtils {
     private final static int POPULAR_KEY = 100;
     private final static int RATE_KEY= 110;
 
-    private final static String API_KEY_VALUE = "e9e99938bcab5766c55c2c258dc27ce4";
+    private final static String API_KEY_VALUE = "";
 
 //    Used for the poster request
 
