@@ -2,6 +2,7 @@ package com.exemple.android.popularmovies.utilities;
 
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +12,10 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class NetworkUtils {
+//    Used in Log
+    private static final String TAG = NetworkUtils.class.getSimpleName();
 
+    //    Used for the movie DB request
     private final static String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3";
 
     private final static String PARAM_POPULAR ="/movie/popular";
@@ -23,7 +27,11 @@ public class NetworkUtils {
     private final static int POPULAR_KEY = 100;
     private final static int RATE_KEY= 110;
 
-    private final static String API_KEY_VALUE = "";
+    private final static String API_KEY_VALUE = "e9e99938bcab5766c55c2c258dc27ce4";
+
+//    Used for the poster request
+
+    private final static String POSTER_BASE_URL= "http://image.tmdb.org/t/p/";
 
 
     public static URL buildUrl(int REQUEST_KEY){
@@ -46,6 +54,26 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
+        Log.v(TAG, "Built URI " + url);
+        return url;
+    }
+
+    public static URL buildURL(String posterPath, String posterSize){
+
+        Uri ourBuiltUri = Uri.parse(POSTER_BASE_URL).buildUpon()
+                .appendPath(posterSize)
+                .appendPath(posterPath)
+                .build();
+
+        URL url = null;
+
+        try{
+            url = new URL(ourBuiltUri.toString());
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
         return url;
     }
 

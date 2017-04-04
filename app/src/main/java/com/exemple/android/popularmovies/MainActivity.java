@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void makeTheMovieDBSearchQuery(int queryCOde){
+    private void loadMovieData(int queryCOde){
         URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryCOde);
-        new MovieDBQueryTask().execute(theMovieDBSearchURL);
+        new FetchMovieTask().execute(theMovieDBSearchURL);
 
 
     }
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
 
-    public class MovieDBQueryTask extends AsyncTask<URL,Void,String>{
+    public class FetchMovieTask extends AsyncTask<URL,Void,String>{
 
         @Override
         protected void onPreExecute() {
@@ -66,11 +66,13 @@ public class MainActivity extends AppCompatActivity {
             String movieDBSearchResults = null;
             try {
                 movieDBSearchResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
+                return movieDBSearchResults;
             } catch (IOException e){
                 e.printStackTrace();
+                return null;
             }
 
-            return movieDBSearchResults;
+
         }
 
         @Override
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int menuItemThatWhatSelected = item.getItemId();
         if(menuItemThatWhatSelected == R.id.action_sort){
-            makeTheMovieDBSearchQuery(100);
+            loadMovieData(100);
             Context context = MainActivity.this;
             String message = getString(R.string.toast_sort);
             Toast.makeText(context,message,Toast.LENGTH_LONG).show();
