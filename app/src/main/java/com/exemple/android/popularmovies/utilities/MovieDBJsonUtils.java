@@ -1,120 +1,116 @@
 package com.exemple.android.popularmovies.utilities;
 
 
+import android.content.ContentValues;
+import android.content.Context;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MovieDBJsonUtils {
-}
 
-/*
-        Response to the Get API Configuration request
-        https://api.themoviedb.org/3/configuration?api_key=<<api_key>>
+    private static final String MDB_PAGE = "page";
+    private static final String MDB_RESULTS = "results";
 
-        HttpResponse<String> response = Unirest.get("https://api.themoviedb.org/3/configuration?api_key=e<<api_key>>")
-        .body("{}")
-        .asString();
+    private static final String MDB_POSTER_PATH = "poster_path";
+    private static final String MDB_ADULT = "adult";
+    private static final String MDB_OVERVIEW = "overview";
+    private static final String MDB_RELEASE_DATE = "release_date";
+    private static final String MDB_GENRE_IDS = "genre_ids";
+    private static final String MDB_ID = "id";
+    private static final String MDB_ORIGINAL_TITLE = "original_title";
+    private static final String MDB_ORIGINAL_LANGUAGE = "original_language";
+    private static final String MDB_TITLE = "title";
+    private static final String MDB_BACKDROP_PATH = "backdrop_path";
+    private static final String MDB_POPULARITY = "popularity";
+    private static final String MDB_VOTE_COUNT = "vote_count";
+    private static final String MDB_VIDEO = "video";
+    private static final String MDB_VOTE_AVERAGE = "vote_average";
 
-        {
-        "images": {
-        "base_url": "http://image.tmdb.org/t/p/",
-        "secure_base_url": "https://image.tmdb.org/t/p/",
-        "backdrop_sizes": [
-        "w300",
-        "w780",
-        "w1280",
-        "original"
-        ],
-        "logo_sizes": [
-        "w45",
-        "w92",
-        "w154",
-        "w185",
-        "w300",
-        "w500",
-        "original"
-        ],
-        "poster_sizes": [
-        "w92",
-        "w154",
-        "w185",
-        "w342",
-        "w500",
-        "w780",
-        "original"
-        ],
-        "profile_sizes": [
-        "w45",
-        "w185",
-        "h632",
-        "original"
-        ],
-        "still_sizes": [
-        "w92",
-        "w185",
-        "w300",
-        "original"
-        ]
-        },
-        "change_keys": [
-        "adult",
-        "air_date",
-        "also_known_as",
-        "alternative_titles",
-        "biography",
-        "birthday",
-        "budget",
-        "cast",
-        "certifications",
-        "character_names",
-        "created_by",
-        "crew",
-        "deathday",
-        "episode",
-        "episode_number",
-        "episode_run_time",
-        "freebase_id",
-        "freebase_mid",
-        "general",
-        "genres",
-        "guest_stars",
-        "homepage",
-        "images",
-        "imdb_id",
-        "languages",
-        "name",
-        "network",
-        "origin_country",
-        "original_name",
-        "original_title",
-        "overview",
-        "parts",
-        "place_of_birth",
-        "plot_keywords",
-        "production_code",
-        "production_companies",
-        "production_countries",
-        "releases",
-        "revenue",
-        "runtime",
-        "season",
-        "season_number",
-        "season_regular",
-        "spoken_languages",
-        "status",
-        "tagline",
-        "title",
-        "translations",
-        "tvdb_id",
-        "tvrage_id",
-        "type",
-        "video",
-        "videos"
-        ]
+    private static final String MDB_TOTAL_RESULTS = "total_results";
+    private static final String MDB_TOTAL_PAGES = "total_pages";
+
+    public static ContentValues[] getMovieContentValuesFromJson(Context context, String movieDBJsonStr)
+        throws JSONException {
+
+        JSONObject movieDBJson = new JSONObject(movieDBJsonStr);
+
+        // What would be a unambiguous flag for an error JSON ?
+
+        JSONArray jsonMovieArray = movieDBJson.getJSONArray(MDB_RESULTS);
+
+        ContentValues[] movieDBContentValues = new ContentValues[jsonMovieArray.length()];
+
+        for (int i = 0; i < jsonMovieArray.length(); i++) {
+
+            String posterPath;
+            boolean adult;
+            String overview;
+            String release_date;
+//            int[] genreIds;
+            String genreIds = "";
+            int id;
+            String originalTitle;
+            String originalLanguage;
+            String title;
+            String backdropPath;
+            double popularity;
+            double voteCount;
+            boolean video;
+            double voteAverage;
+
+            /*Get the JSON object representing the movie */
+            JSONObject movie = jsonMovieArray.getJSONObject(i);
+
+            posterPath = movie.getString(MDB_POSTER_PATH);
+            adult = movie.getBoolean(MDB_ADULT);
+            overview = movie.getString(MDB_OVERVIEW);
+            release_date = movie.getString(MDB_RELEASE_DATE);
+
+//            JSONArray genreIdObject = movie.getJSONArray(MDB_GENRE_IDS);
+//            genreIds = new int[genreIdObject.length()];
+//            for (int j = 0; j < genreIdObject.length(); j++){
+//                genreIds[j] = genreIdObject.getInt(j);
+//            }
+
+            JSONArray genreIdObject = movie.getJSONArray(MDB_GENRE_IDS);
+            for (int j = 0; j < genreIdObject.length(); j++){
+                genreIds += genreIdObject.getInt(j);
+            }
+
+            id = movie.getInt(MDB_ID);
+            originalTitle = movie.getString(MDB_ORIGINAL_TITLE);
+            originalLanguage = movie.getString(MDB_ORIGINAL_LANGUAGE);
+            title = movie.getString(MDB_TITLE);
+            backdropPath = movie.getString(MDB_BACKDROP_PATH);
+            popularity = movie.getDouble(MDB_POPULARITY);
+            voteCount = movie.getDouble(MDB_VOTE_COUNT);
+            video = movie.getBoolean(MDB_VIDEO);
+            voteAverage = movie.getDouble(MDB_VOTE_AVERAGE);
+
+            ContentValues movieValues = new ContentValues();
+            movieValues.put(MDB_POSTER_PATH,posterPath);
+            movieValues.put(MDB_ADULT,adult);
+            movieValues.put(MDB_OVERVIEW,overview);
+            movieValues.put(MDB_RELEASE_DATE,release_date);
+            movieValues.put(MDB_GENRE_IDS,genreIds);
+            movieValues.put(MDB_ID,id);
+            movieValues.put(MDB_ORIGINAL_TITLE,originalTitle);
+            movieValues.put(MDB_ORIGINAL_LANGUAGE,originalLanguage);
+            movieValues.put(MDB_TITLE,title);
+            movieValues.put(MDB_BACKDROP_PATH,backdropPath);
+            movieValues.put(MDB_POPULARITY,popularity);
+            movieValues.put(MDB_VOTE_COUNT,voteCount);
+            movieValues.put(MDB_VIDEO,video);
+            movieValues.put(MDB_VOTE_AVERAGE,voteAverage);
+
+            movieDBContentValues[i] = movieValues;
         }
+    return movieDBContentValues;
+    }
 
-
-
-        */
-
+}
 /*
 Response for a single movie searh
         https://api.themoviedb.org/3/search/movie?api_key={api_key}&query=Jack+Reacher
@@ -145,3 +141,49 @@ Response for a single movie searh
 the id : 343611 item is used for querying the remaining details
         https://api.themoviedb.org/3/movie/343611?api_key={api_key}
 */
+/*
+
+The popular query return a JSON like that :
+
+        "page": 1,
+        "results": [{
+        "poster_path": "\/tWqifoYuwLETmmasnGHO7xBjEtt.jpg",
+        "adult": false,
+        "overview": "A live-action adaptation of Disney's version of the classic 'Beauty and the Beast' tale of a cursed prince and a beautiful young woman who helps him break the spell.",
+        "release_date": "2017-03-17",
+        "genre_ids": [14,
+        10402,
+        10749],
+        "id": 321612,
+        "original_title": "Beauty and the Beast",
+        "original_language": "en",
+        "title": "Beauty and the Beast",
+        "backdrop_path": "\/6aUWe0GSl69wMTSWWexsorMIvwU.jpg",
+        "popularity": 180.45132,
+        "vote_count": 1246,
+        "video": false,
+        "vote_average": 7.1
+        },
+        {
+        "poster_path": "\/45Y1G5FEgttPAwjTYic6czC9xCn.jpg",
+        "adult": false,
+        "overview": "In the near future, a weary Logan cares for an ailing Professor X in a hide out on the Mexican border. But Logan's attempts to hide from the world and his legacy are up-ended when a young mutant arrives, being pursued by dark forces.",
+        "release_date": "2017-02-28",
+        "genre_ids": [28,
+        18,
+        878],
+        "id": 263115,
+        "original_title": "Logan",
+        "original_language": "en",
+        "title": "Logan",
+        "backdrop_path": "\/5pAGnkFYSsFJ99ZxDIYnhQbQFXs.jpg",
+        "popularity": 117.369877,
+        "vote_count": 2075,
+        "video": false,
+        "vote_average": 7.6
+        },
+
+....
+....
+        "total_results": 19481,
+        "total_pages": 975 */
