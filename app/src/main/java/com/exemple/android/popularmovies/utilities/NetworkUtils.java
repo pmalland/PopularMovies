@@ -62,7 +62,7 @@ public class NetworkUtils {
 
         Uri ourBuiltUri = Uri.parse(POSTER_BASE_URL).buildUpon()
                 .appendPath(posterSize)
-                .appendPath(posterPath)
+                .appendEncodedPath(posterPath)
                 .build();
 
         URL url = null;

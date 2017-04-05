@@ -31,12 +31,35 @@ public class MovieDBJsonUtils {
     private static final String MDB_TOTAL_RESULTS = "total_results";
     private static final String MDB_TOTAL_PAGES = "total_pages";
 
+
+    public static String[] getMoviePathToPosterFromJson(Context context, String movieDBJsonStr)
+        throws JSONException {
+
+        JSONObject movieDBJson = new JSONObject(movieDBJsonStr);
+
+        //What would be an unambiguous flag for an error JSON ?
+
+        JSONArray jsonMovieArray = movieDBJson.getJSONArray(MDB_RESULTS);
+
+        String[] movieDBPathToPoster = new String[jsonMovieArray.length()];
+
+        for (int i = 0; i < jsonMovieArray.length(); i++){
+            String posterPath;
+
+            JSONObject movie = jsonMovieArray.getJSONObject(i);
+
+            posterPath = movie.getString(MDB_POSTER_PATH);
+            movieDBPathToPoster[i] = posterPath;
+        }
+        return movieDBPathToPoster;
+    }
+
     public static ContentValues[] getMovieContentValuesFromJson(Context context, String movieDBJsonStr)
         throws JSONException {
 
         JSONObject movieDBJson = new JSONObject(movieDBJsonStr);
 
-        // What would be a unambiguous flag for an error JSON ?
+        // What would be an unambiguous flag for an error JSON ?
 
         JSONArray jsonMovieArray = movieDBJson.getJSONArray(MDB_RESULTS);
 

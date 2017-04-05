@@ -11,9 +11,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
-import java.io.IOException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
 
-    public class FetchMovieTask extends AsyncTask<URL,Void,String>{
+    public class FetchMovieTask extends AsyncTask<URL,Void,String[]>{
 
         @Override
         protected void onPreExecute() {
@@ -61,13 +61,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(URL... params) {
+        protected String[] doInBackground(URL... params) {
             URL searchURL = params[0];
-            String movieDBSearchResults = null;
+            String jsonMovieDBResults = null;
             try {
-                movieDBSearchResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
-                return movieDBSearchResults;
-            } catch (IOException e){
+                jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
+                String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(MainActivity.this, jsonMovieDBResults);
+                return simplePathToPosterList;
+            } catch (Exception e){
                 e.printStackTrace();
                 return null;
             }
@@ -76,10 +77,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String movieDBSearchResults) {
+        protected void onPostExecute(String[] moviePathToPosterList) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if(movieDBSearchResults != null && !movieDBSearchResults.equals("")){
-                mSearchResultDisplay.setText(movieDBSearchResults);
+            if(moviePathToPosterList != null){
+                mSearchResultDisplay.setText("");
+                for(String pathToPosterString : moviePathToPosterList){
+                    URL urlToPoster = NetworkUtils.buildURL(pathToPosterString, "w185");
+
+                    mSearchResultDisplay.append((urlToPoster.toString()) + "\n\n");
+//                    mSearchResultDisplay.append((pathToPosterString) + "\n\n");
+
+                  /*  %2F */
+
+                }
+
             } else {
                 shorErrorMessage();
             }
