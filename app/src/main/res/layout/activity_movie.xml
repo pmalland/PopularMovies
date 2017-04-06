@@ -9,7 +9,7 @@
     tools:context="com.exemple.android.popularmovies.MainActivity">
 
 
-    <ImageView
+   <!-- <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryLight" />
@@ -21,17 +21,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/primary_text"/>
-    </ScrollView>
+    </ScrollView>-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false" />
-    <ImageView
+   <!-- <ImageView
         android:id="@+id/first_poster_iv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
+-->
     <TextView
         android:id="@+id/error_message_tv"
         android:layout_width="wrap_content"

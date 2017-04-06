@@ -4,26 +4,34 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
-import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
+//    private static final int NUM_LIST_ITEMS = 100;
+//    Number of columns handled by the Grid Layout Manader
+    private static final int SPAN_COUNT = 4;
+
+    private MovieAdapter mMovieAdapter;
+
+    private RecyclerView mMovieListRecyclerView;
+
 
 //    A text view for testing purposes
-    private TextView mSearchResultDisplay;
-    private ImageView mTestPosterDisplay;
+//    private TextView mSearchResultDisplay;
+//    private ImageView mTestPosterDisplay;
 
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
@@ -33,10 +41,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
 
-        mSearchResultDisplay = (TextView) findViewById(R.id.test_text_text_view);
+        mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
+
+        GridLayoutManager layoutManager = new GridLayoutManager(this,SPAN_COUNT);
+
+        mMovieListRecyclerView.setLayoutManager(layoutManager);
+        mMovieListRecyclerView.setHasFixedSize(true);
+
+        mMovieAdapter = new MovieAdapter(this);
+
+        mMovieListRecyclerView.setAdapter(mMovieAdapter);
+
+//        mSearchResultDisplay = (TextView) findViewById(R.id.test_text_text_view);
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
-        mTestPosterDisplay =(ImageView) findViewById(R.id.first_poster_iv);
+//        mTestPosterDisplay =(ImageView) findViewById(R.id.first_poster_iv);
     }
 
 
@@ -50,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void showDataView(){
         mErrorMessageTextView.setVisibility(View.INVISIBLE);
-        mSearchResultDisplay.setVisibility(View.VISIBLE);
+        mMovieListRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showErrorMessage(){
-        mSearchResultDisplay.setVisibility(View.INVISIBLE);
+        mMovieListRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
 
@@ -83,23 +102,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String[] moviePathToPosterList) {
+        protected void onPostExecute(String[] moviePathToPosterListStr) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if(moviePathToPosterList != null){
+            if(moviePathToPosterListStr != null){
                 showDataView();
-                mSearchResultDisplay.setText("");
-
-                for(String pathToPosterString : moviePathToPosterList){
-                    URL urlToPoster = NetworkUtils.buildURL(pathToPosterString, "w185");
-
-                    mSearchResultDisplay.append((urlToPoster.toString()) + "\n\n");
-//                    mSearchResultDisplay.append((pathToPosterString) + "\n\n");
-
-                }
-
-                URL urlToFirstPoster = NetworkUtils.buildURL(moviePathToPosterList[0], "w185");
-                Picasso.with(MainActivity.this).load(urlToFirstPoster.toString()).into(mTestPosterDisplay);
-                mTestPosterDisplay.setVisibility(View.VISIBLE);
+//                mSearchResultDisplay.setText("");
+//                String[] moviePathToPosterUrlStr = new String[moviePathToPosterListStr.length];
+//                for(String pathToPosterString : moviePathToPosterListStr){
+//                    URL urlToPoster = NetworkUtils.buildURL(pathToPosterString, "w185");
+//
+//                    mSearchResultDisplay.append((urlToPoster.toString()) + "\n\n");
+////                    mSearchResultDisplay.append((pathToPosterString) + "\n\n");
+//
+//                }
+                mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w185");
+//                URL urlToFirstPoster = NetworkUtils.buildURL(moviePathToPosterListStr[0], "w185");
+//                Picasso.with(MainActivity.this).load(urlToFirstPoster.toString()).into(mTestPosterDisplay);
+//                mTestPosterDisplay.setVisibility(View.VISIBLE);
             } else {
                 showErrorMessage();
             }
@@ -118,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int menuItemThatWhatSelected = item.getItemId();
         if(menuItemThatWhatSelected == R.id.action_sort){
-            mSearchResultDisplay.setText("");
-            mTestPosterDisplay.setVisibility(View.INVISIBLE);
+//            mSearchResultDisplay.setText("");
+//            mTestPosterDisplay.setVisibility(View.INVISIBLE);
             loadMovieData(100);
             Context context = MainActivity.this;
             String message = getString(R.string.toast_sort);

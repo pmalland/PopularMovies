@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
-        android:id="@+id/movie_thumbnail"
+        android:id="@+id/iv_item_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:background="@color/teal50"/>
