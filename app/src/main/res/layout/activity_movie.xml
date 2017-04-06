@@ -6,7 +6,6 @@
     android:id="@+id/activity_movie"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.exemple.android.popularmovies.MainActivity">
 
 
@@ -24,11 +23,14 @@
             android:textColor="@color/primary_text"/>
     </ScrollView>
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_movie"
+        android:id="@+id/recycler_view_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false" />
-
+    <ImageView
+        android:id="@+id/first_poster_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/error_message_tv"
