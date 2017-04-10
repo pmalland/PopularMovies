@@ -1,37 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:id="@+id/activity_movie"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.exemple.android.popularmovies.MainActivity">
+    tools:context="com.exemple.android.popularmovies.MainActivity"
+    android:background="@color/colorPrimaryDark" >
 
 
-   <!-- <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimaryLight" />
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/test_text_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/primary_text"/>
-    </ScrollView>-->
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false" />
-   <!-- <ImageView
-        android:id="@+id/first_poster_iv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
--->
+        android:clipToPadding="true"
+        android:scrollbars="vertical"
+        android:background="#CCCC"/>
+
     <TextView
         android:id="@+id/error_message_tv"
         android:layout_width="wrap_content"
@@ -44,7 +31,7 @@
 
 
 
-    <!--A progres bar appears when the movies data is still loading-->
+    <!--A progress bar appears when the movies data is still loading-->
     <ProgressBar
         android:id="@+id/loading_indicator_pb"
         android:layout_width="42dp"
@@ -53,4 +40,4 @@
         android:visibility="invisible" />
 
 
-</FrameLayout>
+</RelativeLayout>

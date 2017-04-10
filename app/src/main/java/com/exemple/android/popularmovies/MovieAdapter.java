@@ -22,9 +22,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private String[] mPosterPath;
     private String mPosterSize;
 
-    public MovieAdapter(Context context) {
-//        mNumberItems = numberOfItem;
-        mContext = context;}
+    //reference to a list item click listener
+    private final ListItemClickListener mOnClickListener;
+
+
+
+    public MovieAdapter(Context context, ListItemClickListener listener) {
+        mContext = context;
+        mOnClickListener = listener;
+    }
+
 
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -35,9 +42,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup,shouldAttachToParentImmediately);
-        MovieAdapterViewHolder viewHolder = new MovieAdapterViewHolder(view);
+//        MovieAdapterViewHolder viewHolder = new MovieAdapterViewHolder(view);
 
-        return viewHolder;
+        return new MovieAdapterViewHolder(view);
     }
 
     @Override
@@ -64,7 +71,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         notifyDataSetChanged();
     }
 
-    class MovieAdapterViewHolder extends RecyclerView.ViewHolder {
+    class MovieAdapterViewHolder extends RecyclerView.ViewHolder
+                implements View.OnClickListener {
 
         ImageView listItemMovieView;
 
@@ -72,6 +80,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             super(itemView);
 
             listItemMovieView = (ImageView) itemView.findViewById(R.id.iv_item_movie);
+
+            itemView.setOnClickListener(this);
         }
 
         void bind (String pathToImage){
@@ -79,6 +89,19 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             Picasso.with(mContext).load(urlToFirstPoster.toString()).into(listItemMovieView);
 
         }
+
+        @Override
+        public void onClick(View view) {
+            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onListItemClick(clickedPosition);
+        }
     }
 
+
+//    The interface that receives onClick messages
+
+    public interface ListItemClickListener {
+        void onListItemClick(int clickedItemIndex);
+
+    }
 }

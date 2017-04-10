@@ -2,7 +2,6 @@ package com.exemple.android.popularmovies.utilities;
 
 
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +53,7 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
-        Log.v(TAG, "Built URI " + url);
+//        Log.v(TAG, "Built URI " + url);
         return url;
     }
 
@@ -73,7 +72,7 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
-        Log.v(TAG, "Built URI " + url);
+//        Log.v(TAG, "Built URI " + url);
         return url;
     }
 

@@ -18,23 +18,23 @@ import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements MovieAdapter.ListItemClickListener{
 
-//    private static final int NUM_LIST_ITEMS = 100;
+
 //    Number of columns handled by the Grid Layout Manader
-    private static final int SPAN_COUNT = 4;
+    private static final int SPAN_COUNT = 3;
 
     private MovieAdapter mMovieAdapter;
 
     private RecyclerView mMovieListRecyclerView;
 
 
-//    A text view for testing purposes
-//    private TextView mSearchResultDisplay;
-//    private ImageView mTestPosterDisplay;
 
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
+
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +43,18 @@ public class MainActivity extends AppCompatActivity {
 
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this,SPAN_COUNT);
+        GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),SPAN_COUNT);
 
         mMovieListRecyclerView.setLayoutManager(layoutManager);
         mMovieListRecyclerView.setHasFixedSize(true);
 
-        mMovieAdapter = new MovieAdapter(this);
+        mMovieAdapter = new MovieAdapter(this, this);
 
         mMovieListRecyclerView.setAdapter(mMovieAdapter);
 
-//        mSearchResultDisplay = (TextView) findViewById(R.id.test_text_text_view);
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
-//        mTestPosterDisplay =(ImageView) findViewById(R.id.first_poster_iv);
+
     }
 
 
@@ -76,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         mMovieListRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
+
+
 
     public class FetchMovieTask extends AsyncTask<URL,Void,String[]>{
 
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 ////                    mSearchResultDisplay.append((pathToPosterString) + "\n\n");
 //
 //                }
-                mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w185");
+                mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
 //                URL urlToFirstPoster = NetworkUtils.buildURL(moviePathToPosterListStr[0], "w185");
 //                Picasso.with(MainActivity.this).load(urlToFirstPoster.toString()).into(mTestPosterDisplay);
 //                mTestPosterDisplay.setVisibility(View.VISIBLE);
@@ -146,4 +147,17 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        if(mToast != null){
+            mToast.cancel();
+        }
+
+        String toastMessage = "item #" + clickedItemIndex + " clicked";
+        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
+
+        mToast.show();
+    }
+
 }
