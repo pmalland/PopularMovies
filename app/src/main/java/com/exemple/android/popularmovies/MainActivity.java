@@ -1,6 +1,7 @@
 package com.exemple.android.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity
 
     private Toast mToast;
 
+    // key for saved instance
+    private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +58,8 @@ public class MainActivity extends AppCompatActivity
 
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
+
+        loadMovieData(100);
 
     }
 
@@ -107,19 +113,9 @@ public class MainActivity extends AppCompatActivity
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             if(moviePathToPosterListStr != null){
                 showDataView();
-//                mSearchResultDisplay.setText("");
-//                String[] moviePathToPosterUrlStr = new String[moviePathToPosterListStr.length];
-//                for(String pathToPosterString : moviePathToPosterListStr){
-//                    URL urlToPoster = NetworkUtils.buildURL(pathToPosterString, "w185");
-//
-//                    mSearchResultDisplay.append((urlToPoster.toString()) + "\n\n");
-////                    mSearchResultDisplay.append((pathToPosterString) + "\n\n");
-//
-//                }
+
                 mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
-//                URL urlToFirstPoster = NetworkUtils.buildURL(moviePathToPosterListStr[0], "w185");
-//                Picasso.with(MainActivity.this).load(urlToFirstPoster.toString()).into(mTestPosterDisplay);
-//                mTestPosterDisplay.setVisibility(View.VISIBLE);
+
             } else {
                 showErrorMessage();
             }
@@ -138,8 +134,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int menuItemThatWhatSelected = item.getItemId();
         if(menuItemThatWhatSelected == R.id.action_sort){
-//            mSearchResultDisplay.setText("");
-//            mTestPosterDisplay.setVisibility(View.INVISIBLE);
+            mMovieAdapter = new MovieAdapter(this,this);
+            mMovieListRecyclerView.setAdapter(mMovieAdapter);
             loadMovieData(100);
             Context context = MainActivity.this;
             String message = getString(R.string.toast_sort);
@@ -158,6 +154,18 @@ public class MainActivity extends AppCompatActivity
         mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
 
         mToast.show();
+
+
+        Context context = MainActivity.this;
+        Class destinationActivity = DetailActivity.class;
+
+        Intent startDetailActivityIntent = new Intent(context, destinationActivity);
+
+        startDetailActivityIntent.putExtra(Intent.EXTRA_TEXT,toastMessage);
+
+        startActivity(startDetailActivityIntent);
     }
+
+
 
 }
