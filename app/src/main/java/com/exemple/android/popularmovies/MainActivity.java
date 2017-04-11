@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,13 +17,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 
+
+
 public class MainActivity extends AppCompatActivity
-        implements MovieAdapter.ListItemClickListener{
+        implements MovieAdapter.ListItemClickListener,
+        LoaderManager.LoaderCallbacks<String[]>{
 
 
 //    Number of columns handled by the Grid Layout Manader
@@ -40,6 +47,8 @@ public class MainActivity extends AppCompatActivity
     // key for saved instance
     private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
 
+    private static final int ID_MOVIE_LOADER = 23;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,15 +67,25 @@ public class MainActivity extends AppCompatActivity
 
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
+   ;
+//        loadMovieData(MoviePreferences.getDefaultSortingCriterion());
 
-        loadMovieData(100);
+        showDataView();
+        int loaderID = ID_MOVIE_LOADER;
+
+        LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
+
+        Bundle bundleForLoader = null;
+
+        getSupportLoaderManager().initLoader(loaderID,bundleForLoader,callbacks);
+
 
     }
 
 
-    private void loadMovieData(int queryCOde){
+    private void loadMovieData(String queryKey){
         showDataView();
-        URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryCOde);
+        URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
         new FetchMovieTask().execute(theMovieDBSearchURL);
 
 
@@ -82,7 +101,70 @@ public class MainActivity extends AppCompatActivity
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public Loader<String[]> onCreateLoader(int loaderId, Bundle loadArgs) {
 
+        return new AsyncTaskLoader<String[]>(this) {
+
+            String[] mMovieData = null;
+
+            @Override
+            protected void onStartLoading() {
+
+                if(mMovieData != null){
+                    deliverResult(mMovieData);
+                }else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
+
+            }
+
+            @Override
+            public String[] loadInBackground() {
+                String queryKey = MoviePreferences.getDefaultSortingCriterion();
+                URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
+                String jsonMovieDBResults = null;
+
+                try {
+                    jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(theMovieDBSearchURL);
+                    String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(MainActivity.this, jsonMovieDBResults);
+                    return simplePathToPosterList;
+                } catch (Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+
+            @Override
+            public void deliverResult(String[] data) {
+                mMovieData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] moviePathToPosterListStr) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if(moviePathToPosterListStr != null){
+            showDataView();
+
+            mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
+
+        } else {
+            showErrorMessage();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+
+    }
+    private void invalidateDate(){
+        mMovieAdapter.setPathToPoster(null,"w342");
+    }
 
     public class FetchMovieTask extends AsyncTask<URL,Void,String[]>{
 
@@ -136,7 +218,10 @@ public class MainActivity extends AppCompatActivity
         if(menuItemThatWhatSelected == R.id.action_sort){
             mMovieAdapter = new MovieAdapter(this,this);
             mMovieListRecyclerView.setAdapter(mMovieAdapter);
-            loadMovieData(100);
+
+//            loadMovieData(MoviePreferences.getDefaultSortingCriterion());
+            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+
             Context context = MainActivity.this;
             String message = getString(R.string.toast_sort);
             Toast.makeText(context,message,Toast.LENGTH_LONG).show();

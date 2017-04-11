@@ -23,8 +23,8 @@ public class NetworkUtils {
     private final static String RATE_QUERY_BASE_URL = THEMOVIEDB_BASE_URL + PARAM_RATE;
     private final static String PARAM_API_KEY = "api_key";
 
-    private final static int POPULAR_KEY = 100;
-    private final static int RATE_KEY= 110;
+    private final static String POPULAR_KEY = "popular";
+    private final static String RATE_KEY= "rate";
 
     private final static String API_KEY_VALUE = "";
 
@@ -33,11 +33,11 @@ public class NetworkUtils {
     private final static String POSTER_BASE_URL= "http://image.tmdb.org/t/p/";
 
 
-    public static URL buildUrl(int REQUEST_KEY){
+    public static URL buildUrl(String REQUEST_KEY){
         String QUERY_BASE_URL = null;
-        if(REQUEST_KEY == POPULAR_KEY){
+        if(REQUEST_KEY.equals(POPULAR_KEY)){
             QUERY_BASE_URL = POPULAR_QUERY_BASE_URL;
-        } else if (REQUEST_KEY == RATE_KEY){
+        } else if (REQUEST_KEY.equals(RATE_KEY)){
             QUERY_BASE_URL = RATE_QUERY_BASE_URL;
         }
         Uri ourBuiltUri = Uri.parse(QUERY_BASE_URL).buildUpon()
