@@ -122,13 +122,14 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public String[] loadInBackground() {
-                String queryCriterion = MoviePreferences.getPreferredSortingCriterion(MainActivity.this);
+                Context context = MainActivity.this;
+                String queryCriterion = MoviePreferences.getPreferredSortingCriterion(context);
                 URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryCriterion);
                 String jsonMovieDBResults = null;
 
                 try {
                     jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(theMovieDBSearchURL);
-                    String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(MainActivity.this, jsonMovieDBResults);
+                    String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(context, jsonMovieDBResults);
                     return simplePathToPosterList;
                 } catch (Exception e){
                     e.printStackTrace();
@@ -216,17 +217,26 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int menuItemThatWhatSelected = item.getItemId();
-        if(menuItemThatWhatSelected == R.id.action_sort){
-            mMovieAdapter = new MovieAdapter(this,this);
-            mMovieListRecyclerView.setAdapter(mMovieAdapter);
+        Context context = MainActivity.this;
+        String message = null;
+        if(menuItemThatWhatSelected == R.id.action_sort_by_popularity){
 
-//            loadMovieData(MoviePreferences.getDefaultSortingCriterion());
-            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
-
-            Context context = MainActivity.this;
-            String message = getString(R.string.toast_sort);
+            MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_popular));
+            message = getString(R.string.toast_popular_sort);
             Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+
+        }else if(menuItemThatWhatSelected == R.id.action_sort_by_rate){
+
+            MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_most_rated));
+            message = getString(R.string.toast_rate_sort);
+            Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+
         }
+        mMovieAdapter = new MovieAdapter(this,this);
+        mMovieListRecyclerView.setAdapter(mMovieAdapter);
+        // restarting the loader
+        getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+
         return super.onOptionsItemSelected(item);
     }
 
