@@ -1,6 +1,8 @@
 <resources>
-    <!--Use throughout Popular Movies-->
 
+    <!-- - - - - - - - - - - - - - - - - - -
+      - Used throughout Popular Movies  -
+      - - - - - - - - - - - - - - - - - - -->
     <string name="app_name">Popular Movies</string>
 
     <string name="criterion_popular">popular</string>
@@ -8,31 +10,46 @@
 
 
     <string name="sort">Sort</string>
-    <!--Used in the action bar-->
+
+    <!-- - - - - - - - - - - - - - -
+      - Used in the action bar  -
+      - - - - - - - - - - - - - -->
 
     <string name="action_sort">Sort</string>
     <string name="action_popular">By Popularity</string>
     <string name="action_rate">By Rate</string>
 
-    <!--Toast Message -->
+
+    <!-- - - - - - - - - - -
+      - Toast messages  -
+      - - - - - - - - - - -->
+
     <string name="toast_sort">Sort clicked</string>
     <string name="toast_popular_sort">Sorting by popularity</string>
     <string name="toast_rate_sort">Sorting by rate</string>
 
-    <!--Used in NetworkUtils-->
+    <!-- - - - - - - - - - - - - -
+      - Used in NetworkUtils  -
+      - - - - - - - - - - - - - -->
     <string name="themoviedb_base_url">http://api.themoviedb.org/3</string>
 
-    <!--An error message-->
+
+    <!-- - - - - - - - - - - -
+      - An error message  -
+      - - - - - - - - - - - -->
     <string name="error_message">Something has gone wrong here</string>
 
-    <!--Used in Preferences-->
+
+    <!-- - - - - - - - - - - - - - - -
+      - Used in MoviePreferences  -
+      - - - - - - - - - - - - - - - -->
 
     <!-- Key name for storing criterion in MoviePreferences -->
-    <string name="pref_sort_criterion_key">criterion</string>
+    <string name="pref_sort_criterion_key" translatable="false">criterion</string>
 
     <string name="pref_sort_criterion_default">popular</string>
 
-    <string name="pref_poster_resolution_key">poster</string>
+    <string name="pref_poster_resolution_key" translatable="false">poster</string>
     <string name="pref_poster_resolution_default">w342</string>
 
 </resources>
