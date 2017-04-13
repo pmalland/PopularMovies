@@ -3,6 +3,9 @@
 
     <string name="app_name">Popular Movies</string>
 
+    <string name="criterion_popular">popular</string>
+    <string name="criterion_most_rated">rate</string>
+
 
     <string name="sort">Sort</string>
     <!--Used in the action bar-->
@@ -19,4 +22,15 @@
 
     <!--An error message-->
     <string name="error_message">Something has gone wrong here</string>
+
+    <!--Used in Preferences-->
+
+    <!-- Key name for storing criterion in MoviePreferences -->
+    <string name="pref_sort_criterion_key">criterion</string>
+
+    <string name="pref_sort_criterion_default">popular</string>
+
+    <string name="pref_poster_resolution_key">poster</string>
+    <string name="pref_poster_resolution_default">w342</string>
+
 </resources>

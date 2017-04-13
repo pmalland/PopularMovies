@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public String[] loadInBackground() {
-                String queryKey = MoviePreferences.getDefaultSortingCriterion();
-                URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
+                String queryCriterion = MoviePreferences.getPreferredSortingCriterion(MainActivity.this);
+                URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryCriterion);
                 String jsonMovieDBResults = null;
 
                 try {
@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         if(moviePathToPosterListStr != null){
             showDataView();
-
-            mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
+            String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
+            mMovieAdapter.setPathToPoster(moviePathToPosterListStr,posterResolution);
 
         } else {
             showErrorMessage();
@@ -163,7 +163,8 @@ public class MainActivity extends AppCompatActivity
 
     }
     private void invalidateDate(){
-        mMovieAdapter.setPathToPoster(null,"w342");
+        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
+        mMovieAdapter.setPathToPoster(null,posterResolution);
     }
 
     public class FetchMovieTask extends AsyncTask<URL,Void,String[]>{
