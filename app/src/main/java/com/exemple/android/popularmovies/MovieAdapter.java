@@ -1,6 +1,7 @@
 package com.exemple.android.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     //reference to a list item click listener
     private final ListItemClickListener mOnClickListener;
 
-
+    private Cursor mCursor;
 
     public MovieAdapter(Context context, ListItemClickListener listener) {
         mContext = context;

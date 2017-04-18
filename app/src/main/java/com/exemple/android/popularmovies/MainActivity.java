@@ -1,7 +1,17 @@
+/*
+* Hi,
+* My name is Paul Malland from Belgium. I build this app on the context of my nanodegree in Android.
+* Courses are provided by Udacity and sponsored by Google All Mighty.
+* This is project 1
+*
+* */
+
+
 package com.exemple.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -17,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exemple.android.popularmovies.data.MovieListDbHelper;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
@@ -49,6 +60,9 @@ public class MainActivity extends AppCompatActivity
 
     private static final int ID_MOVIE_LOADER = 23;
 
+    // reference to the DB
+    SQLiteDatabase mDb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +82,10 @@ public class MainActivity extends AppCompatActivity
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
    ;
+        MovieListDbHelper dbHelper = new MovieListDbHelper(this);
+
+        mDb = dbHelper.getWritableDatabase();
+
 //        loadMovieData(MoviePreferences.getDefaultSortingCriterion());
 
         showDataView();
