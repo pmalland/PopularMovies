@@ -31,6 +31,7 @@ public class MovieListContract {
         public static final String COLUMN_RELEASE_DATE= "releaseDate";
         public static final String COLUMN_ORIGINAL_TITLE = "originalTitle";
         public static final String COLUMN_VOTE_AVERAGE ="voteAverage";
+        public static final String COLUMN_MOVIE_ID ="movieId";
 
     }
 }

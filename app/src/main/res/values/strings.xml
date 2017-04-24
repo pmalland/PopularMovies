@@ -11,6 +11,8 @@
 
     <string name="sort">Sort</string>
 
+    <string name="content_authority">com.exemple.android.popularmovies</string>
+
     <!-- - - - - - - - - - - - - - -
       - Used in the action bar  -
       - - - - - - - - - - - - - -->

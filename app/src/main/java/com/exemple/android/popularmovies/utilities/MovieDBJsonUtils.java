@@ -18,7 +18,7 @@ public class MovieDBJsonUtils {
     private static final String MDB_OVERVIEW = "overview";
     private static final String MDB_RELEASE_DATE = "release_date";
     private static final String MDB_GENRE_IDS = "genre_ids";
-    private static final String MDB_ID = "id";
+    private static final String MDB_MOVIE_ID = "movie_id";
     private static final String MDB_ORIGINAL_TITLE = "original_title";
     private static final String MDB_ORIGINAL_LANGUAGE = "original_language";
     private static final String MDB_TITLE = "title";
@@ -72,6 +72,7 @@ public class MovieDBJsonUtils {
             String release_date;
             String originalTitle;
             double voteAverage;
+            int movieId;
 
             /*Get the JSON object representing the movie */
             JSONObject movie = jsonMovieArray.getJSONObject(i);
@@ -81,6 +82,7 @@ public class MovieDBJsonUtils {
             release_date = movie.getString(MDB_RELEASE_DATE);
             originalTitle = movie.getString(MDB_ORIGINAL_TITLE);
             voteAverage = movie.getDouble(MDB_VOTE_AVERAGE);
+            movieId = movie.getInt(MDB_MOVIE_ID);
 
             ContentValues movieValues = new ContentValues();
             movieValues.put(MDB_POSTER_PATH,posterPath);
@@ -88,6 +90,7 @@ public class MovieDBJsonUtils {
             movieValues.put(MDB_RELEASE_DATE,release_date);
             movieValues.put(MDB_ORIGINAL_TITLE,originalTitle);
             movieValues.put(MDB_VOTE_AVERAGE,voteAverage);
+            movieValues.put(MDB_MOVIE_ID,movieId);
 
             movieDBContentValues[i] = movieValues;
         }

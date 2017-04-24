@@ -11,11 +11,13 @@ package com.exemple.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -27,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MovieListDbHelper;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
@@ -38,7 +41,7 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.ListItemClickListener,
-        LoaderManager.LoaderCallbacks<String[]>{
+        LoaderManager.LoaderCallbacks<Cursor>{
 
 
 //    Number of columns handled by the Grid Layout Manader
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private MovieAdapter mMovieAdapter;
 
     private RecyclerView mMovieListRecyclerView;
+    private int mPosition = RecyclerView.NO_POSITION;
 
 
 
@@ -58,10 +62,26 @@ public class MainActivity extends AppCompatActivity
     // key for saved instance
     private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
 
+    // Main Loader ID
     private static final int ID_MOVIE_LOADER = 23;
 
     // reference to the DB
     SQLiteDatabase mDb;
+
+    /*********************
+     ** MAIN PROJECTION **
+     *********************/
+    public static final String[] MAIN_MOVIE_PROJECTION = {
+            MovieListContract.MovieListEntry.COLUMN_POSTER_PATH,
+            MovieListContract.MovieListEntry.COLUMN_MOVIE_ID,
+    };
+
+    /***********
+     ** INDEX **
+     ***********/
+    public static final int INDEX_MOVIE_POSTER = 0;
+    public static final int INDEX_MOVIE_ID = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,18 +104,11 @@ public class MainActivity extends AppCompatActivity
    ;
         MovieListDbHelper dbHelper = new MovieListDbHelper(this);
 
-        mDb = dbHelper.getWritableDatabase();
-
 //        loadMovieData(MoviePreferences.getDefaultSortingCriterion());
 
-        showDataView();
-        int loaderID = ID_MOVIE_LOADER;
+        showLoadingIndicator();
 
-        LoaderManager.LoaderCallbacks<String[]> callbacks = MainActivity.this;
-
-        Bundle bundleForLoader = null;
-
-        getSupportLoaderManager().initLoader(loaderID,bundleForLoader,callbacks);
+        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,this);
 
 
     }
@@ -120,8 +133,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<String[]> onCreateLoader(int loaderId, Bundle loadArgs) {
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle loadArgs) {
 
+        switch (loaderId){
+            case ID_MOVIE_LOADER:
+                Uri movieQueryUri = MovieListContract.MovieListEntry.CONTENT_URI;
+
+                String sortOrder = null;
+                String selection = null;
+
+                return new CursorLoader(this,
+                        movieQueryUri,
+                        MAIN_MOVIE_PROJECTION,
+                        selection,
+                        null,
+                        sortOrder);
+            default:
+                throw new RuntimeException("Loader not implemented : " + loaderId);
+        }
+/*
         return new AsyncTaskLoader<String[]>(this) {
 
             String[] mMovieData = null;
@@ -161,29 +191,32 @@ public class MainActivity extends AppCompatActivity
                 mMovieData = data;
                 super.deliverResult(data);
             }
-        };
+        };*/
     }
 
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] moviePathToPosterListStr) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if(moviePathToPosterListStr != null){
-            showDataView();
-            String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
-            mMovieAdapter.setPathToPoster(moviePathToPosterListStr,posterResolution);
 
-        } else {
-            showErrorMessage();
-        }
+        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
+        mMovieAdapter.swapCursor(data, posterResolution);
+        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+
+        mMovieListRecyclerView.smoothScrollToPosition(mPosition);
+
+        if (data.getCount() != 0) showDataView();
+
+
     }
 
     @Override
-    public void onLoaderReset(Loader<String[]> loader) {
-
+    public void onLoaderReset(Loader<Cursor> loader) {
+        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
+        mMovieAdapter.swapCursor(null, posterResolution);
     }
     private void invalidateDate(){
         String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
-        mMovieAdapter.setPathToPoster(null,posterResolution);
+        mMovieAdapter.swapCursor(null, posterResolution);
     }
 
     public class FetchMovieTask extends AsyncTask<URL,Void,String[]>{
@@ -216,7 +249,7 @@ public class MainActivity extends AppCompatActivity
             if(moviePathToPosterListStr != null){
                 showDataView();
 
-                mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
+              //  mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
 
             } else {
                 showErrorMessage();
@@ -259,27 +292,32 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
+    public void onListItemClick(int movieIdInteger) {
+        String movieIdString = Integer.toString(movieIdInteger);
         if(mToast != null){
             mToast.cancel();
         }
 
-        String toastMessage = "item #" + clickedItemIndex + " clicked";
+        String toastMessage = "movie ID :" + movieIdString + " selected";
         mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
 
         mToast.show();
 
 
-        Context context = MainActivity.this;
-        Class destinationActivity = DetailActivity.class;
+        Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
+                .appendPath(movieIdString)
+                .build();
 
-        Intent startDetailActivityIntent = new Intent(context, destinationActivity);
+        Intent startDetailActivityIntent = new Intent(MainActivity.this, DetailActivity.class);
 
-        startDetailActivityIntent.putExtra(Intent.EXTRA_TEXT,toastMessage);
+        startDetailActivityIntent.setData(detailUri);
 
         startActivity(startDetailActivityIntent);
     }
 
-
+    private void showLoadingIndicator(){
+        mMovieListRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
 
 }

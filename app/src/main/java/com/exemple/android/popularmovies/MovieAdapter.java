@@ -2,6 +2,7 @@ package com.exemple.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     private Cursor mCursor;
 
-    public MovieAdapter(Context context, ListItemClickListener listener) {
+    public MovieAdapter(@NonNull Context context, ListItemClickListener listener) {
         mContext = context;
         mOnClickListener = listener;
     }
@@ -37,37 +38,32 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
-        Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.movie_list_item;
-        LayoutInflater inflater = LayoutInflater.from(context);
-        boolean shouldAttachToParentImmediately = false;
-
-        View view = inflater.inflate(layoutIdForListItem, viewGroup,shouldAttachToParentImmediately);
-//        MovieAdapterViewHolder viewHolder = new MovieAdapterViewHolder(view);
+        View view = LayoutInflater
+                .from(mContext)
+                .inflate(R.layout.movie_list_item,viewGroup,false);
+        view.setFocusable(true);
 
         return new MovieAdapterViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
-        String pathToPoster = mPosterPath[position];
-        movieAdapterViewHolder.bind(pathToPoster);
 
+        mCursor.moveToPosition(position);
+
+        String pathToPoster =mCursor.getString(MainActivity.INDEX_MOVIE_POSTER);
+        movieAdapterViewHolder.bind(pathToPoster);
 
     }
 
     @Override
     public int getItemCount() {
-        if (mPosterPath == null){
-            return 0;
-        } else {
-            return mPosterPath.length;
-        }
-
+        if (null == mCursor) return 0;
+        return mCursor.getCount();
     }
 
-    public void setPathToPoster(String[] pathToPoster, String posterSize){
-        mPosterPath = pathToPoster;
+    public void swapCursor(Cursor cursor, String posterSize){
+        mCursor = cursor;
         mPosterSize = posterSize;
         notifyDataSetChanged();
     }
@@ -94,7 +90,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListItemClick(clickedPosition);
+            mCursor.moveToPosition(clickedPosition);
+
+            int movieIdInteger = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
+            mOnClickListener.onListItemClick(movieIdInteger);
         }
     }
 
@@ -102,7 +101,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 //    The interface that receives onClick messages
 
     public interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
+        void onListItemClick(int movieIdInteger);
 
     }
 }
