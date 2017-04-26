@@ -9,6 +9,7 @@
 
 package com.exemple.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -30,7 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.exemple.android.popularmovies.data.MovieListContract;
-import com.exemple.android.popularmovies.data.MovieListDbHelper;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         LoaderManager.LoaderCallbacks<Cursor>{
 
 
-//    Number of columns handled by the Grid Layout Manader
+//    Number of columns handled by the Grid Layout Manager
     private static final int SPAN_COUNT = 3;
 
     private MovieAdapter mMovieAdapter;
@@ -102,9 +102,9 @@ public class MainActivity extends AppCompatActivity
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
    ;
-        MovieListDbHelper dbHelper = new MovieListDbHelper(this);
+   //     MovieListDbHelper dbHelper = new MovieListDbHelper(this);
 
-//        loadMovieData(MoviePreferences.getDefaultSortingCriterion());
+       loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
 
         showLoadingIndicator();
 
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private void loadMovieData(String queryKey){
-        showDataView();
+      //  showDataView();
         URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
         new FetchMovieTask().execute(theMovieDBSearchURL);
 
@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity
             try {
                 jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
                 String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(MainActivity.this, jsonMovieDBResults);
+                ContentValues[] dataFromJson = MovieDBJsonUtils.getMovieContentValuesFromJson(MainActivity.this, jsonMovieDBResults);
                 return simplePathToPosterList;
             } catch (Exception e){
                 e.printStackTrace();
