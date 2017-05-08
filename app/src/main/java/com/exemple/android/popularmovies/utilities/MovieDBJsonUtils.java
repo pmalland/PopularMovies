@@ -4,6 +4,8 @@ package com.exemple.android.popularmovies.utilities;
 import android.content.ContentValues;
 import android.content.Context;
 
+import com.exemple.android.popularmovies.data.MovieListContract;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +20,7 @@ public class MovieDBJsonUtils {
     private static final String MDB_OVERVIEW = "overview";
     private static final String MDB_RELEASE_DATE = "release_date";
     private static final String MDB_GENRE_IDS = "genre_ids";
-    private static final String MDB_MOVIE_ID = "movie_id";
+    private static final String MDB_MOVIE_ID = "id";
     private static final String MDB_ORIGINAL_TITLE = "original_title";
     private static final String MDB_ORIGINAL_LANGUAGE = "original_language";
     private static final String MDB_TITLE = "title";
@@ -85,12 +87,12 @@ public class MovieDBJsonUtils {
             movieId = movie.getInt(MDB_MOVIE_ID);
 
             ContentValues movieValues = new ContentValues();
-            movieValues.put(MDB_POSTER_PATH,posterPath);
-            movieValues.put(MDB_OVERVIEW,overview);
-            movieValues.put(MDB_RELEASE_DATE,release_date);
-            movieValues.put(MDB_ORIGINAL_TITLE,originalTitle);
-            movieValues.put(MDB_VOTE_AVERAGE,voteAverage);
-            movieValues.put(MDB_MOVIE_ID,movieId);
+            movieValues.put(MovieListContract.MovieListEntry.COLUMN_POSTER_PATH,posterPath);
+            movieValues.put(MovieListContract.MovieListEntry.COLUMN_OVERVIEW,overview);
+            movieValues.put(MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE,release_date);
+            movieValues.put(MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE,originalTitle);
+            movieValues.put(MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE,voteAverage);
+            movieValues.put(MovieListContract.MovieListEntry.COLUMN_MOVIE_ID,movieId);
 
             movieDBContentValues[i] = movieValues;
         }

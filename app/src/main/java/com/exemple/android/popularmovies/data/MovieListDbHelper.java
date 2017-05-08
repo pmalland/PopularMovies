@@ -9,7 +9,7 @@ public class MovieListDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "movielist.db";
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 5;
 
     public MovieListDbHelper(Context context){
         super(context,DATABASE_NAME,null,DATABASE_VERSION);
@@ -24,7 +24,8 @@ public class MovieListDbHelper extends SQLiteOpenHelper {
                 MovieListContract.MovieListEntry.COLUMN_OVERVIEW + " TEXT NOT NULL," +
                 MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
                 MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL," +
-                MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE + " INTEGER NOT NULL" +
+                MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE + " INTEGER NOT NULL," +
+                MovieListContract.MovieListEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL" +
                 ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIELIST_TABLE);

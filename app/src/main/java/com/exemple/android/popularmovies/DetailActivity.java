@@ -10,6 +10,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
@@ -101,18 +102,22 @@ public class DetailActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+//        Toast.makeText(DetailActivity.this, "Loading Data", Toast.LENGTH_LONG).show();
         boolean cursorHasValidDate = false;
         if (cursor != null && cursor.moveToFirst()){
             cursorHasValidDate = true;
         }
         if(!cursorHasValidDate){
+            String message = getString(R.string.toast_empty_cursor);
+            Toast.makeText(DetailActivity.this, message, Toast.LENGTH_LONG).show();
             return;
         }
 
         mOriginalTitleTextView.setText(cursor.getString(INDEX_MOVIE_ORIGINAL_TITLE));
         bind(cursor.getString(INDEX_MOVIE_POSTER));
         mReleaseDateTextView.setText(cursor.getString(INDEX_MOVIE_RELEASE_DATE));
-        mRateTextView.setText(Integer.toString(cursor.getInt(INDEX_MOVIE_VOTE_AVERAGE)) + "/10");
+        String rate = Integer.toString(cursor.getInt(INDEX_MOVIE_VOTE_AVERAGE)) + "/10";
+        mRateTextView.setText(rate);
         mOverviewTextView.setText(cursor.getString(INDEX_MOVIE_OVERVIEW));
     }
 

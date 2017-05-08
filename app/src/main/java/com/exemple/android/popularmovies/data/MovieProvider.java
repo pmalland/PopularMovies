@@ -6,6 +6,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 
@@ -19,8 +20,8 @@ public class MovieProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     public static UriMatcher buildUriMatcher(){
-        UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        String authority = MovieListContract.CONTENT_AUTHORITY;
+        final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = MovieListContract.CONTENT_AUTHORITY;
         /*for a whole directory
          the Uri would looks like : content://com.exemple.android.popularmovies/movies
          */
@@ -41,7 +42,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, ContentValues[] values) {
 
         final SQLiteDatabase db = mMovieHelper.getWritableDatabase();
 
@@ -77,18 +78,16 @@ public class MovieProvider extends ContentProvider {
 
     }
 
-    @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
-        final SQLiteDatabase db = mMovieHelper.getReadableDatabase();
+//        final SQLiteDatabase db = mMovieHelper.getReadableDatabase();
 
-        int match = sUriMatcher.match(uri);
         Cursor returnCursor;
 
-        switch (match){
-            case CODE_MOVIES:
-                returnCursor = db.query(MovieListContract.MovieListEntry.TABLE_NAME,
+        switch (sUriMatcher.match(uri)){
+            case CODE_MOVIES:{
+                returnCursor = mMovieHelper.getReadableDatabase().query(MovieListContract.MovieListEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -96,17 +95,21 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            case CODE_MOVIES_WITH_ID:
+            }
+            case CODE_MOVIES_WITH_ID:{
                 String movieIdentifier = uri.getLastPathSegment();
 
                 String[] selectionArguments = new String[]{movieIdentifier};
-                returnCursor = db.query(MovieListContract.MovieListEntry.TABLE_NAME,
+                returnCursor = mMovieHelper.getReadableDatabase().query(
+                        MovieListContract.MovieListEntry.TABLE_NAME,
                         projection,
-                        MovieListContract.MovieListEntry._ID + "=?",
-                        selectionArgs,
+                        MovieListContract.MovieListEntry.COLUMN_MOVIE_ID + " = ? ",
+                        selectionArguments,
                         null,
                         null,
                         sortOrder);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
@@ -130,17 +133,18 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-         final SQLiteDatabase db = mMovieHelper.getWritableDatabase();
+        final SQLiteDatabase db = mMovieHelper.getWritableDatabase();
         int rowDeletedCount = 0;
         if (null == selection){selection = "1";}
 
         switch (sUriMatcher.match(uri)) {
-            case CODE_MOVIES:
+            case CODE_MOVIES: {
 
                 rowDeletedCount = db.delete(MovieListContract.MovieListEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
                 break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

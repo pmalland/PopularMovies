@@ -29,6 +29,9 @@
     <string name="toast_sort">Sort clicked</string>
     <string name="toast_popular_sort">Sorting by popularity</string>
     <string name="toast_rate_sort">Sorting by rate</string>
+    <string name="toast_no_sort_needed">Already sorted that way</string>
+    <string name="toast_empty_cursor">Unexpected empty cursor</string>
+    <string name="toast_querying_for_a_movie">Looking for a movie</string>
 
     <!-- - - - - - - - - - - - - -
       - Used in NetworkUtils  -

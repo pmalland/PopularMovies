@@ -37,6 +37,7 @@ import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 
+import static com.exemple.android.popularmovies.data.MoviePreferences.getPreferredSortingCriterion;
 
 
 public class MainActivity extends AppCompatActivity
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
 
+        loadMovieData(getPreferredSortingCriterion(this));
+
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
 
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),SPAN_COUNT);
@@ -104,13 +107,13 @@ public class MainActivity extends AppCompatActivity
    ;
    //     MovieListDbHelper dbHelper = new MovieListDbHelper(this);
 
-       loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
+
 
         showLoadingIndicator();
 
-        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,this);
 
 
+        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
     }
 
 
@@ -139,15 +142,12 @@ public class MainActivity extends AppCompatActivity
             case ID_MOVIE_LOADER:
                 Uri movieQueryUri = MovieListContract.MovieListEntry.CONTENT_URI;
 
-                String sortOrder = null;
-                String selection = null;
-
                 return new CursorLoader(this,
                         movieQueryUri,
                         MAIN_MOVIE_PROJECTION,
-                        selection,
                         null,
-                        sortOrder);
+                        null,
+                        null);
             default:
                 throw new RuntimeException("Loader not implemented : " + loaderId);
         }
@@ -219,23 +219,25 @@ public class MainActivity extends AppCompatActivity
         mMovieAdapter.swapCursor(null, posterResolution);
     }
 
-    public class FetchMovieTask extends AsyncTask<URL,Void,String[]>{
+
+    public class FetchMovieTask extends AsyncTask<URL,Void,ContentValues[]>{
 
         @Override
         protected void onPreExecute() {
+            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
             super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
+
         }
 
         @Override
-        protected String[] doInBackground(URL... params) {
+        protected ContentValues[] doInBackground(URL... params) {
             URL searchURL = params[0];
             String jsonMovieDBResults = null;
             try {
                 jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
                 String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(MainActivity.this, jsonMovieDBResults);
                 ContentValues[] dataFromJson = MovieDBJsonUtils.getMovieContentValuesFromJson(MainActivity.this, jsonMovieDBResults);
-                return simplePathToPosterList;
+                return dataFromJson;
             } catch (Exception e){
                 e.printStackTrace();
                 return null;
@@ -245,12 +247,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(String[] moviePathToPosterListStr) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if(moviePathToPosterListStr != null){
-                showDataView();
+        protected void onPostExecute(ContentValues[] movieData) {
+            if(movieData != null){
+                MainActivity.this.getContentResolver().bulkInsert(MovieListContract.MovieListEntry.CONTENT_URI,movieData);
 
-              //  mMovieAdapter.setPathToPoster(moviePathToPosterListStr,"w342");
+
+
 
             } else {
                 showErrorMessage();
@@ -271,23 +273,44 @@ public class MainActivity extends AppCompatActivity
         int menuItemThatWhatSelected = item.getItemId();
         Context context = MainActivity.this;
         String message = null;
+        String oldPreference = MoviePreferences.getPreferredSortingCriterion(this);
+        boolean preferenceChanged = false;
+        if(mToast != null){
+            mToast.cancel();
+        }
         if(menuItemThatWhatSelected == R.id.action_sort_by_popularity){
-
-            MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_popular));
-            message = getString(R.string.toast_popular_sort);
-            Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+            if (!(oldPreference.equals(getString(R.string.criterion_popular)))) {
+                MoviePreferences.setPreferredSortingCriterion(context, getString(R.string.criterion_popular));
+                message = getString(R.string.toast_popular_sort);
+                mToast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+                mToast.show();
+                preferenceChanged = true;
+            }
 
         }else if(menuItemThatWhatSelected == R.id.action_sort_by_rate){
-
-            MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_most_rated));
-            message = getString(R.string.toast_rate_sort);
-            Toast.makeText(context,message,Toast.LENGTH_LONG).show();
-
+            if (!(oldPreference.equals(getString(R.string.criterion_most_rated)))){
+                MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_most_rated));
+                message = getString(R.string.toast_rate_sort);
+                mToast = Toast.makeText(context,message,Toast.LENGTH_LONG);
+                mToast.show();
+                preferenceChanged = true;
+            }
         }
-        mMovieAdapter = new MovieAdapter(this,this);
-        mMovieListRecyclerView.setAdapter(mMovieAdapter);
-        // restarting the loader
-        getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+        if (preferenceChanged){
+            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
+            loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
+            mMovieAdapter = new MovieAdapter(this,this);
+            mMovieListRecyclerView.setAdapter(mMovieAdapter);
+
+            // restarting the loader
+            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+
+        }else {
+            message = getString(R.string.toast_no_sort_needed);
+            mToast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+            mToast.show();
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -300,9 +323,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         String toastMessage = "movie ID :" + movieIdString + " selected";
-        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
+       /* mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
 
-        mToast.show();
+        mToast.show();*/
 
 
         Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
