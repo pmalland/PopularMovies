@@ -15,7 +15,7 @@
 
     <!-- - - - - - - - - - - - - - -
       - Used in the action bar  -
-      - - - - - - - - - - - - - -->
+      - - - - - - - - - - - - - - -->
 
     <string name="action_sort">Sort</string>
     <string name="action_popular">By Popularity</string>
