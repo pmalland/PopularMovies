@@ -45,8 +45,7 @@ public class MainActivity extends AppCompatActivity
         LoaderManager.LoaderCallbacks<Cursor>{
 
 
-//    Number of columns handled by the Grid Layout Manager
-    private static final int SPAN_COUNT = 3;
+
 
     private MovieAdapter mMovieAdapter;
 
@@ -92,8 +91,10 @@ public class MainActivity extends AppCompatActivity
         loadMovieData(getPreferredSortingCriterion(this));
 
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
+        //    Number of columns handled by the Grid Layout Manager
+        final int gridSpanCount = getResources().getInteger(R.integer.movie_grid_span_count) ;
 
-        GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),SPAN_COUNT);
+        GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),gridSpanCount);
 
         mMovieListRecyclerView.setLayoutManager(layoutManager);
         mMovieListRecyclerView.setHasFixedSize(true);

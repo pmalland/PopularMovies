@@ -28,4 +28,10 @@
     <dimen name="text_display3">112sp</dimen>
     <dimen name="text_display4">224sp</dimen>
 
+    <!-- - - - - - - - - - - - - - - - -
+      - GridLayoutManager parameter  -
+      - - - - - - - - - - - - - - - - -->
+    <integer name="movie_grid_span_count">3</integer>
+    <dimen name="movie_thumbnail_height">400dp</dimen>
+
 </resources>
