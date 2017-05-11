@@ -42,7 +42,7 @@
     <!-- - - - - - - - - - - -
       - An error message  -
       - - - - - - - - - - - -->
-    <string name="error_message">Something has gone wrong here</string>
+    <string name="error_message">Something wrong.Please check your internet connection.</string>
 
 
     <!-- - - - - - - - - - - - - - - -

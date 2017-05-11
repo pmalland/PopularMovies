@@ -3,6 +3,6 @@
       - GridLayoutManager parameter  -
       - - - - - - - - - - - - - - - - -->
     <integer name="movie_grid_span_count">4</integer>
-    <dimen name="movie_thumbnail_height">400dp</dimen>
+    <dimen name="movie_thumbnail_height">480dp</dimen>
 
 </resources>
