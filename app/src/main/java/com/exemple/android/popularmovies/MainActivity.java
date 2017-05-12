@@ -13,7 +13,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -59,14 +58,8 @@ public class MainActivity extends AppCompatActivity
 
     private Toast mToast;
 
-    // key for saved instance
-    private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
-
     // Main Loader ID
     private static final int ID_MOVIE_LOADER = 23;
-
-    // reference to the DB
-    SQLiteDatabase mDb;
 
     /*********************
      ** MAIN PROJECTION **
@@ -88,10 +81,12 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
 
+        // Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
+        // to get the actual criterion saved in the preferences
         loadMovieData(getPreferredSortingCriterion(this));
 
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
-        //    Number of columns handled by the Grid Layout Manager
+        //    Number of columns handled by the Grid Layout Manager according to the device dimension
         final int gridSpanCount = getResources().getInteger(R.integer.movie_grid_span_count) ;
 
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),gridSpanCount);
@@ -104,37 +99,57 @@ public class MainActivity extends AppCompatActivity
         mMovieListRecyclerView.setAdapter(mMovieAdapter);
 
         mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
+
+        // A loading indicator that will took the front stage while the data are loaded
         mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
-   ;
-   //     MovieListDbHelper dbHelper = new MovieListDbHelper(this);
-
-
-
         showLoadingIndicator();
 
-
-
+        // Initialize a loader or re use the already started one if it exists
+        /* Connect the activity whit le Loader life cycle  */
         getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
     }
 
 
+
+    /**
+     *Initiating the asynchronous task that gets our data from internet
+     *
+     * @param queryKey determine the sorting criterion of the movies data
+     */
     private void loadMovieData(String queryKey){
-      //  showDataView();
         URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
         new FetchMovieTask().execute(theMovieDBSearchURL);
 
 
     }
 
+
+
+
+    /**
+     * Showing the recycler view
+     */
     private void showDataView(){
         mErrorMessageTextView.setVisibility(View.INVISIBLE);
         mMovieListRecyclerView.setVisibility(View.VISIBLE);
     }
 
+
+    /**
+     * Showing an error message
+     */
     private void showErrorMessage(){
         mMovieListRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
+
+    /**
+     * Cursor Loader called  when a new Loader needs to be created to fetch data from de data base
+     *
+     * @param loaderId The loader ID for which we need to create a loader
+     * @param loadArgs   Any arguments supplied by the caller
+     * @return A new Loader instance that is ready to start loading.
+     */
 
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle loadArgs) {
@@ -152,54 +167,24 @@ public class MainActivity extends AppCompatActivity
             default:
                 throw new RuntimeException("Loader not implemented : " + loaderId);
         }
-/*
-        return new AsyncTaskLoader<String[]>(this) {
 
-            String[] mMovieData = null;
-
-            @Override
-            protected void onStartLoading() {
-
-                if(mMovieData != null){
-                    deliverResult(mMovieData);
-                }else {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-
-            }
-
-            @Override
-            public String[] loadInBackground() {
-                Context context = MainActivity.this;
-                String queryCriterion = MoviePreferences.getPreferredSortingCriterion(context);
-                URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryCriterion);
-                String jsonMovieDBResults = null;
-
-                try {
-                    jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(theMovieDBSearchURL);
-                    String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(context, jsonMovieDBResults);
-                    return simplePathToPosterList;
-                } catch (Exception e){
-                    e.printStackTrace();
-                    return null;
-                }
-
-            }
-
-            @Override
-            public void deliverResult(String[] data) {
-                mMovieData = data;
-                super.deliverResult(data);
-            }
-        };*/
     }
 
+    /**
+     * Called  on the main trade when a Loader has finished loading data.
+     *
+     * @param loader The Loader that has finished.
+     * @param data The data generated by the Loader.
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
+        // I chose to put the poster resolution in the preferences with some other features in mind
+        // that maybe the memory size of the images would cause problems.
+        // It turns out the features are not implemented yet and I let myself that door open
         String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
+
         mMovieAdapter.swapCursor(data, posterResolution);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
 
@@ -210,19 +195,24 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /**
+     *
+     * @param loader The Loader that is being reset.
+     */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
         mMovieAdapter.swapCursor(null, posterResolution);
     }
-    private void invalidateDate(){
-        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
-        mMovieAdapter.swapCursor(null, posterResolution);
-    }
 
+    /**
+     * The asynchronous task that gets our data from internet
+     */
 
     public class FetchMovieTask extends AsyncTask<URL,Void,ContentValues[]>{
-
+        /**
+         * Flushing the existing data base
+         */
         @Override
         protected void onPreExecute() {
             MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
@@ -230,15 +220,22 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        /**
+         * Fetching a JSON containing the data from the internet using NetworkUtils and then
+         * factoring it into a ContentValues[]
+         *
+         * @param params containing the URL to perform the search on internet
+         * @return dataFromJson the ContentValues[] containing the movies data
+         */
         @Override
         protected ContentValues[] doInBackground(URL... params) {
             URL searchURL = params[0];
-            String jsonMovieDBResults = null;
+            String jsonMovieDBResults;
             try {
                 jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
-                String[] simplePathToPosterList = MovieDBJsonUtils.getMoviePathToPosterFromJson(MainActivity.this, jsonMovieDBResults);
-                ContentValues[] dataFromJson = MovieDBJsonUtils.getMovieContentValuesFromJson(MainActivity.this, jsonMovieDBResults);
-                return dataFromJson;
+           /*MovieDBJsonUtils.getMovieContentValuesFromJson returns a ContentValues[]
+                 whit all the data extracted from the Json*/
+                return MovieDBJsonUtils.getMovieContentValuesFromJson(MainActivity.this, jsonMovieDBResults);
             } catch (Exception e){
                 e.printStackTrace();
                 return null;
@@ -247,6 +244,12 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        /**
+         * Filling the database with movieData.
+         * Emptiness of movieData indicated a internet connection problem
+         * or an unusable JSON return from the internet query
+         * @param movieData the movies data
+         */
         @Override
         protected void onPostExecute(ContentValues[] movieData) {
             if(movieData != null){
@@ -261,6 +264,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Inflating the menu
+     *
+     * @param menu The options menu in which we place our items.
+     * @return You must return true for the menu to be displayed;
+     *         if you return false it will not be shown.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -269,16 +279,23 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     *
+     * @param item The menu item that was selected by the user
+     * @return true if you handle the menu click here
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int menuItemThatWhatSelected = item.getItemId();
         Context context = MainActivity.this;
-        String message = null;
+        String message;
         String oldPreference = MoviePreferences.getPreferredSortingCriterion(this);
         boolean preferenceChanged = false;
         if(mToast != null){
             mToast.cancel();
         }
+
+        //Check if we are already displaying the wright data
         if(menuItemThatWhatSelected == R.id.action_sort_by_popularity){
             if (!(oldPreference.equals(getString(R.string.criterion_popular)))) {
                 MoviePreferences.setPreferredSortingCriterion(context, getString(R.string.criterion_popular));
@@ -297,6 +314,8 @@ public class MainActivity extends AppCompatActivity
                 preferenceChanged = true;
             }
         }
+
+        // Only if changes are needed, load the new data in the data base and restart the loader
         if (preferenceChanged){
             MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
             loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
@@ -305,6 +324,7 @@ public class MainActivity extends AppCompatActivity
 
             // restarting the loader
             getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+            return true;
 
         }else {
             message = getString(R.string.toast_no_sort_needed);
@@ -316,23 +336,21 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Responding to clicks on our list.
+     *
+     * @param movieIdInteger the internet Id of the particular movie the user focused on
+     */
     @Override
     public void onListItemClick(int movieIdInteger) {
+        //Casting the id into a string and building the query uri
         String movieIdString = Integer.toString(movieIdInteger);
-        if(mToast != null){
-            mToast.cancel();
-        }
-
-        String toastMessage = "movie ID :" + movieIdString + " selected";
-       /* mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
-
-        mToast.show();*/
-
 
         Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
                 .appendPath(movieIdString)
                 .build();
 
+        // Assembling the Intent to DetailActivity
         Intent startDetailActivityIntent = new Intent(MainActivity.this, DetailActivity.class);
 
         startDetailActivityIntent.setData(detailUri);
@@ -340,6 +358,9 @@ public class MainActivity extends AppCompatActivity
         startActivity(startDetailActivityIntent);
     }
 
+    /**
+     * Show a loading indicator, hiding the data view
+     */
     private void showLoadingIndicator(){
         mMovieListRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingIndicator.setVisibility(View.VISIBLE);

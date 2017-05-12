@@ -11,12 +11,11 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class NetworkUtils {
-//    Used in Log
+    /*Used in Log*/
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-    //    Used for the movie DB request
+     /*Used for the internet request*/
     private final static String THEMOVIEDB_BASE_URL = "http://api.themoviedb.org/3";
-
     private final static String PARAM_POPULAR ="/movie/popular";
     private final static String PARAM_RATE = "/movie/top_rated";
     private final static String POPULAR_QUERY_BASE_URL = THEMOVIEDB_BASE_URL + PARAM_POPULAR ;
@@ -28,7 +27,7 @@ public class NetworkUtils {
 
     private final static String API_KEY_VALUE = "";
 
-//    Used for the poster request
+    /*Used for the poster request*/
 
     private final static String POSTER_BASE_URL= "http://image.tmdb.org/t/p/";
 

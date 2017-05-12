@@ -22,7 +22,6 @@ import java.net.URL;
 public class DetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private String mInfoTestingPurpose;
 
     /************************
      ** VIEWS REFERENCES **
@@ -58,12 +57,14 @@ public class DetailActivity extends AppCompatActivity
     public static final int INDEX_MOVIE_RELEASE_DATE = 2;
     public static final int INDEX_MOVIE_ORIGINAL_TITLE = 3;
     public static final int INDEX_MOVIE_VOTE_AVERAGE = 4;
-    public static final int INDEX_MOVIE_MOVIE_ID = 5;
+//    public static final int INDEX_MOVIE_MOVIE_ID = 5;
 
     private Uri mMovieDetailUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        /* In this activity we query the data base
+         for the details of the selected movie and display it       */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
@@ -73,16 +74,24 @@ public class DetailActivity extends AppCompatActivity
         mRateTextView = (TextView) findViewById(R.id.movie_rate_tv);
         mOverviewTextView = (TextView) findViewById(R.id.overview_tv);
 
+        /*Retrieving the needed uri to find the data we want to display*/
         Intent triggeringIntent = getIntent();
         if (triggeringIntent != null) {
             mMovieDetailUri = triggeringIntent.getData();
         }
         if(mMovieDetailUri == null) throw new NullPointerException("Movie ID for DetailActivity cannot be null");
 
+        /* Connect the activity whit le Loader life cycle  */
         getSupportLoaderManager().initLoader(ID_DETAIL_LOADER,null,this);
     }
 
-
+    /**
+     * Cursor Loader called  when a new Loader needs to be created to fetch data from de data base
+     *
+     * @param loaderId The loader ID for which we need to create a loader
+     * @param args Any arguments supplied by the caller
+     * @return A new Loader instance that is ready to start loading.
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
@@ -100,9 +109,16 @@ public class DetailActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Called  on the main trade when a Loader has finished loading data.
+     *
+     * @param loader The Cursor loader that finished
+     * @param cursor The Cursor that is being returned
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-//        Toast.makeText(DetailActivity.this, "Loading Data", Toast.LENGTH_LONG).show();
+
+        /* Checking if the cursor has valid data, return if it is nor the case*/
         boolean cursorHasValidDate = false;
         if (cursor != null && cursor.moveToFirst()){
             cursorHasValidDate = true;
@@ -112,7 +128,7 @@ public class DetailActivity extends AppCompatActivity
             Toast.makeText(DetailActivity.this, message, Toast.LENGTH_LONG).show();
             return;
         }
-
+        /* Binding party*/
         mOriginalTitleTextView.setText(cursor.getString(INDEX_MOVIE_ORIGINAL_TITLE));
         bind(cursor.getString(INDEX_MOVIE_POSTER));
         mReleaseDateTextView.setText(cursor.getString(INDEX_MOVIE_RELEASE_DATE));
@@ -125,6 +141,12 @@ public class DetailActivity extends AppCompatActivity
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+    /**
+     * Binds the image to her image view using the Picasso library.
+     *
+     * @param pathToImage URL to the needed image
+     */
     void bind (String pathToImage){
         String posterResolution = MoviePreferences.getPreferredPosterResolution(DetailActivity.this);
         URL urlToFirstPoster = NetworkUtils.buildURL(pathToImage, posterResolution);

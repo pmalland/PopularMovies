@@ -14,27 +14,40 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 
+/**
+ * MovieAdapter exposes a list of movie poster from a Cursor containing the path to those posters
+ * to a recycler view
+ */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
+class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
-    private static final String TAG = MovieAdapter.class.getSimpleName();
-
-//    private int mNumberItems;
     private final Context mContext;
-    private String[] mPosterPath;
     private String mPosterSize;
 
-    //reference to a list item click listener
+    /*reference to a list item click listener*/
     private final ListItemClickListener mOnClickListener;
 
     private Cursor mCursor;
 
-    public MovieAdapter(@NonNull Context context, ListItemClickListener listener) {
+    /**
+     * Constructor
+     *
+     * @param context the context used to talk to the UI and app resources
+     * @param listener the click handler
+     */
+    MovieAdapter(@NonNull Context context, ListItemClickListener listener) {
         mContext = context;
         mOnClickListener = listener;
     }
 
-
+    /**
+     * Called when each view holder are created.
+     *
+     * @param viewGroup The ViewGroup that these ViewHolders are contained within.
+     * @param viewType only used if the recycler view has more that on type of item
+     *                 ( not the case here)
+     * @return a new MovieAdapterViewHolder that hold the view for each list item
+     */
     @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
@@ -46,6 +59,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         return new MovieAdapterViewHolder(view);
     }
 
+    /**
+     * Update the content of the view holder
+     *
+     * @param movieAdapterViewHolder The ViewHolder which should be updated to represent
+     *                               the contents of the item at that given position
+     *                               in the data set
+     * @param position              The position of the item within the adapter's data set
+     */
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
 
@@ -56,24 +77,41 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     }
 
+    /**
+     * Returns the number of items to display
+     *
+     * @return the number of items available in our forecast
+     */
     @Override
     public int getItemCount() {
         if (null == mCursor) return 0;
         return mCursor.getCount();
     }
 
-    public void swapCursor(Cursor cursor, String posterSize){
+    /**
+     * Change the content of the cursor.
+     *
+     * @param cursor newCursor the new cursor to use as ForecastAdapter's data source
+     * @param posterSize the argument used to choose the poster resolution
+     *                   we get with the Picasso methods
+     */
+
+    void swapCursor(Cursor cursor, String posterSize){
         mCursor = cursor;
         mPosterSize = posterSize;
         notifyDataSetChanged();
     }
 
+    /**
+     * The view holder. Behave as a cache of the child view for the movies poster.
+     * We also set ab OnClickListener here.
+     */
     class MovieAdapterViewHolder extends RecyclerView.ViewHolder
                 implements View.OnClickListener {
 
         ImageView listItemMovieView;
 
-        public MovieAdapterViewHolder(View itemView) {
+        MovieAdapterViewHolder(View itemView) {
             super(itemView);
 
             listItemMovieView = (ImageView) itemView.findViewById(R.id.iv_item_movie);
@@ -81,26 +119,26 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             itemView.setOnClickListener(this);
         }
 
+        /*Binding the movie poster to his image view with the Picasso library*/
         void bind (String pathToImage){
             URL urlToFirstPoster = NetworkUtils.buildURL(pathToImage, mPosterSize);
             Picasso.with(mContext).load(urlToFirstPoster.toString()).into(listItemMovieView);
-
         }
-
+        /* Given the position of the adapter, we get the corresponding Movie ID from the cursor
+         * and pass it to the onListItemClick method */
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
             mCursor.moveToPosition(clickedPosition);
-
             int movieIdInteger = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
             mOnClickListener.onListItemClick(movieIdInteger);
         }
     }
 
 
-//    The interface that receives onClick messages
+   /* The interface that receives onClick messages*/
 
-    public interface ListItemClickListener {
+    interface ListItemClickListener {
         void onListItemClick(int movieIdInteger);
 
     }
