@@ -81,12 +81,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
 
-        // Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
-        // to get the actual criterion saved in the preferences
+         /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
+         to get the actual criterion saved in the preferences*/
         loadMovieData(getPreferredSortingCriterion(this));
 
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
-        //    Number of columns handled by the Grid Layout Manager according to the device dimension
+           /* Number of columns handled by the Grid Layout Manager according to the device dimension
+           * since we are in onCreate, that mean we can change the grid span count
+           * between portrait and landscape mode*/
         final int gridSpanCount = getResources().getInteger(R.integer.movie_grid_span_count) ;
 
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),gridSpanCount);
@@ -235,7 +237,7 @@ public class MainActivity extends AppCompatActivity
                 jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
            /*MovieDBJsonUtils.getMovieContentValuesFromJson returns a ContentValues[]
                  whit all the data extracted from the Json*/
-                return MovieDBJsonUtils.getMovieContentValuesFromJson(MainActivity.this, jsonMovieDBResults);
+                return MovieDBJsonUtils.getMovieContentValuesFromJson(jsonMovieDBResults);
             } catch (Exception e){
                 e.printStackTrace();
                 return null;
