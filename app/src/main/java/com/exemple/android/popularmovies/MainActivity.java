@@ -13,6 +13,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -80,10 +82,11 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
-
+        if(isOnline()) {
          /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
          to get the actual criterion saved in the preferences*/
-        loadMovieData(getPreferredSortingCriterion(this));
+            loadMovieData(getPreferredSortingCriterion(this));
+        }
 
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
            /* Number of columns handled by the Grid Layout Manager according to the device dimension
@@ -368,4 +371,10 @@ public class MainActivity extends AppCompatActivity
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 }
