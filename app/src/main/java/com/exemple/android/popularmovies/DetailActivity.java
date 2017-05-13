@@ -132,7 +132,7 @@ public class DetailActivity extends AppCompatActivity
         mOriginalTitleTextView.setText(cursor.getString(INDEX_MOVIE_ORIGINAL_TITLE));
         bind(cursor.getString(INDEX_MOVIE_POSTER));
         mReleaseDateTextView.setText(cursor.getString(INDEX_MOVIE_RELEASE_DATE));
-        String rate = Integer.toString(cursor.getInt(INDEX_MOVIE_VOTE_AVERAGE)) + "/10";
+        String rate = Double.toString(cursor.getDouble(INDEX_MOVIE_VOTE_AVERAGE)) + "/10";
         mRateTextView.setText(rate);
         mOverviewTextView.setText(cursor.getString(INDEX_MOVIE_OVERVIEW));
     }
