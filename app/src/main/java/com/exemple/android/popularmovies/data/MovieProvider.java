@@ -86,6 +86,7 @@ public class MovieProvider extends ContentProvider {
                 }
 
                 if (rowInsertedCount > 0){
+
                     getContext().getContentResolver().notifyChange(uri,null);
                 }
                 return rowInsertedCount;
@@ -160,12 +161,15 @@ public class MovieProvider extends ContentProvider {
         return returnCursor;
     }
 
+
     /**
      * Not used in our implementation
+     * @param uri uri
+     * @return type
      */
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
@@ -175,7 +179,7 @@ public class MovieProvider extends ContentProvider {
      */
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
         return null;
     }
 
@@ -192,9 +196,9 @@ public class MovieProvider extends ContentProvider {
      * @return The number of rows deleted
      */
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mMovieHelper.getWritableDatabase();
-        int rowDeletedCount = 0;
+        int rowDeletedCount;
         if (null == selection){selection = "1";}
 
         switch (sUriMatcher.match(uri)) {
@@ -219,7 +223,7 @@ public class MovieProvider extends ContentProvider {
      * Not used in our implementation
      */
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
         return 0;
     }
 }
