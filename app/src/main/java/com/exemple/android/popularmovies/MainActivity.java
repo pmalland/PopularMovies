@@ -1,12 +1,3 @@
-/*
-* Hi,
-* My name is Paul Malland from Belgium. I build this app on the context of my nanodegree in Android.
-* Courses are provided by Udacity and sponsored by Google All Mighty.
-* This is project 1
-*
-* */
-
-
 package com.exemple.android.popularmovies;
 
 import android.content.ContentValues;
@@ -40,27 +31,29 @@ import java.net.URL;
 
 import static com.exemple.android.popularmovies.data.MoviePreferences.getPreferredSortingCriterion;
 
+/*
+* Hi,
+* My name is Paul Malland from Belgium. I build this app on the context of my nanodegree in Android.
+* Courses are provided by Udacity and sponsored by Google All Mighty.
+* This is Popular Movies, Stage 1
+*
+* */
 
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.ListItemClickListener,
         LoaderManager.LoaderCallbacks<Cursor>{
-
-
-
 
     private MovieAdapter mMovieAdapter;
 
     private RecyclerView mMovieListRecyclerView;
     private int mPosition = RecyclerView.NO_POSITION;
 
-
-
     private TextView mErrorMessageTextView;
     private ProgressBar mLoadingIndicator;
 
     private Toast mToast;
 
-    // Main Loader ID
+    /*Main Loader ID*/
     private static final int ID_MOVIE_LOADER = 23;
 
     /*********************
@@ -77,11 +70,11 @@ public class MainActivity extends AppCompatActivity
     public static final int INDEX_MOVIE_POSTER = 0;
     public static final int INDEX_MOVIE_ID = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
+        /*Checking for internet status*/
         if(isOnline()) {
          /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
          to get the actual criterion saved in the preferences*/
@@ -371,6 +364,12 @@ public class MainActivity extends AppCompatActivity
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Checking for internet connection using the connectivity manager.
+     * This is were the permission "ACCESS_NETWORK_STATE" is needed
+     *
+     * @return true if a connection is up or pending
+     */
     public boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

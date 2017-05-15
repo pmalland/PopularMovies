@@ -99,6 +99,11 @@ public class NetworkUtils {
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
 
+        /* Open a connection.
+         * Use a scanner for handling the input and cast it into a String.
+         * Close the connection.
+         * This is were the permission "INTERNET" is needed
+         * */
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try{
             InputStream in = urlConnection.getInputStream();
