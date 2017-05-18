@@ -19,6 +19,9 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class DetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -26,11 +29,11 @@ public class DetailActivity extends AppCompatActivity
     /************************
      ** VIEWS REFERENCES **
      ************************/
-    private TextView mOriginalTitleTextView;
-    private ImageView mThumbnailImageView;
-    private TextView mReleaseDateTextView;
-    private TextView mRateTextView;
-    private TextView mOverviewTextView;
+    @BindView(R.id.original_title_tv) TextView mOriginalTitleTextView;
+    @BindView(R.id.movie_thumbnail_iv) ImageView mThumbnailImageView;
+    @BindView(R.id.movie_release_tv) TextView mReleaseDateTextView;
+    @BindView(R.id.movie_rate_tv) TextView mRateTextView;
+    @BindView(R.id.overview_tv) TextView mOverviewTextView;
 
     /************************
      ** DETAILS LOADER ID **
@@ -68,11 +71,7 @@ public class DetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        mOriginalTitleTextView = (TextView) findViewById(R.id.original_title_tv);
-        mThumbnailImageView = (ImageView) findViewById(R.id.movie_thumbnail_iv);
-        mReleaseDateTextView = (TextView) findViewById(R.id.movie_release_tv);
-        mRateTextView = (TextView) findViewById(R.id.movie_rate_tv);
-        mOverviewTextView = (TextView) findViewById(R.id.overview_tv);
+        ButterKnife.bind(this);
 
         /*Retrieving the needed uri to find the data we want to display*/
         Intent triggeringIntent = getIntent();
@@ -150,7 +149,11 @@ public class DetailActivity extends AppCompatActivity
     void bind (String pathToImage){
         String posterResolution = MoviePreferences.getPreferredPosterResolution(DetailActivity.this);
         URL urlToFirstPoster = NetworkUtils.buildURL(pathToImage, posterResolution);
-        Picasso.with(this).load(urlToFirstPoster.toString()).into(mThumbnailImageView);
+        Picasso.with(this)
+                .load(urlToFirstPoster.toString())
+                .placeholder(R.drawable.ic_file_download_black_48dp)
+                .error(R.drawable.ic_error_black_48dp)
+                .into(mThumbnailImageView);
 
     }
 }

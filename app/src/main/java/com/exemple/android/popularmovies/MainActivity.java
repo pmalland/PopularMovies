@@ -29,6 +29,9 @@ import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static com.exemple.android.popularmovies.data.MoviePreferences.getPreferredSortingCriterion;
 
 /*
@@ -48,8 +51,9 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mMovieListRecyclerView;
     private int mPosition = RecyclerView.NO_POSITION;
 
-    private TextView mErrorMessageTextView;
-    private ProgressBar mLoadingIndicator;
+    @BindView(R.id.error_message_tv) TextView mErrorMessageTextView;
+    // A loading indicator that will took the front stage while the data are loaded
+    @BindView(R.id.loading_indicator_pb) ProgressBar mLoadingIndicator;
 
     private Toast mToast;
 
@@ -96,10 +100,8 @@ public class MainActivity extends AppCompatActivity
 
         mMovieListRecyclerView.setAdapter(mMovieAdapter);
 
-        mErrorMessageTextView = (TextView) findViewById(R.id.error_message_tv);
+        ButterKnife.bind(this);
 
-        // A loading indicator that will took the front stage while the data are loaded
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_pb);
         showLoadingIndicator();
 
         // Initialize a loader or re use the already started one if it exists

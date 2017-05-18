@@ -122,7 +122,11 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         /*Binding the movie poster to his image view with the Picasso library*/
         void bind (String pathToImage){
             URL urlToFirstPoster = NetworkUtils.buildURL(pathToImage, mPosterSize);
-            Picasso.with(mContext).load(urlToFirstPoster.toString()).into(listItemMovieView);
+            Picasso.with(mContext)
+                    .load(urlToFirstPoster.toString())
+                    .placeholder(R.drawable.ic_file_download_black_48dp)
+                    .error(R.drawable.ic_error_black_48dp)
+                    .into(listItemMovieView);
         }
         /* Given the position of the adapter, we get the corresponding Movie ID from the cursor
          * and pass it to the onListItemClick method */
