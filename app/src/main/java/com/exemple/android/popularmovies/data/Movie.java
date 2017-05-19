@@ -48,6 +48,7 @@ public class Movie implements Parcelable {
     }
 
     /**
+     * Private constructor
      * Unwrapping the parcel
      *
      * @param in the parcel

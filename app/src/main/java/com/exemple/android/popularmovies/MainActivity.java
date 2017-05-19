@@ -22,12 +22,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,6 +47,8 @@ import static com.exemple.android.popularmovies.data.MoviePreferences.getPreferr
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.ListItemClickListener,
         LoaderManager.LoaderCallbacks<Cursor>{
+
+    private ArrayList<Movie> mMovieList;
 
     private MovieAdapter mMovieAdapter;
 
@@ -77,6 +81,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_list_key))){
+            mMovieList = new ArrayList<Movie>();
+        }else {
+            mMovieList = savedInstanceState.getParcelableArrayList(getString(R.string.movie_list_key));
+        }
         setContentView(R.layout.activity_movie);
         /*Checking for internet status*/
         if(isOnline()) {
@@ -109,7 +118,11 @@ public class MainActivity extends AppCompatActivity
         getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(getString(R.string.movie_list_key),mMovieList);
+        super.onSaveInstanceState(outState);
+    }
 
     /**
      *Initiating the asynchronous task that gets our data from internet
@@ -122,9 +135,6 @@ public class MainActivity extends AppCompatActivity
 
 
     }
-
-
-
 
     /**
      * Showing the recycler view

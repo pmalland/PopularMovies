@@ -13,6 +13,8 @@
 
     <string name="content_authority">com.exemple.android.popularmovies</string>
 
+    <string name="movie_list_key">movieList</string>
+
     <!-- - - - - - - - - - - - - - -
       - Used in the action bar  -
       - - - - - - - - - - - - - - -->
