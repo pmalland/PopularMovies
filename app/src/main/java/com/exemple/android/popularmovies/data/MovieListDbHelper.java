@@ -4,6 +4,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import static com.exemple.android.popularmovies.data.MovieListContract.MovieListEntry.COLUMN_MOVIE_ID;
+import static com.exemple.android.popularmovies.data.MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE;
+import static com.exemple.android.popularmovies.data.MovieListContract.MovieListEntry.COLUMN_OVERVIEW;
+import static com.exemple.android.popularmovies.data.MovieListContract.MovieListEntry.COLUMN_POSTER_PATH;
+import static com.exemple.android.popularmovies.data.MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE;
+import static com.exemple.android.popularmovies.data.MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE;
+
 /**
  * Managing a data base for movie data
  */
@@ -31,18 +38,19 @@ public class MovieListDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_MOVIELIST_TABLE = "CREATE TABLE " +
                 MovieListContract.MovieListEntry.TABLE_NAME + " (" +
                 MovieListContract.MovieListEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                MovieListContract.MovieListEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL," +
-                MovieListContract.MovieListEntry.COLUMN_OVERVIEW + " TEXT NOT NULL," +
-                MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
-                MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL," +
-                MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL," +
-                MovieListContract.MovieListEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL" +
+                COLUMN_POSTER_PATH + " TEXT NOT NULL," +
+                COLUMN_OVERVIEW + " TEXT NOT NULL," +
+                COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
+                COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL," +
+                COLUMN_VOTE_AVERAGE + " REAL NOT NULL," +
+                COLUMN_MOVIE_ID + " INTEGER NOT NULL" +
                 ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIELIST_TABLE);
 
 
     }
+
 
     /**
      * Discard the data and call onCreate to recreate the table.
