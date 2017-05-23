@@ -81,18 +81,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_list_key))){
-            mMovieList = new ArrayList<Movie>();
-        }else {
-            mMovieList = savedInstanceState.getParcelableArrayList(getString(R.string.movie_list_key));
-        }
+
         setContentView(R.layout.activity_movie);
-        /*Checking for internet status*/
-        if(isOnline()) {
-         /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
-         to get the actual criterion saved in the preferences*/
-            loadMovieData(getPreferredSortingCriterion(this));
-        }
+
 
         mMovieListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_movie);
            /* Number of columns handled by the Grid Layout Manager according to the device dimension
@@ -113,9 +104,21 @@ public class MainActivity extends AppCompatActivity
 
         showLoadingIndicator();
 
+        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_list_key))){
+            mMovieList = new ArrayList<Movie>();
+            /*Checking for internet status*/
+            if(isOnline()) {
+         /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
+         to get the actual criterion saved in the preferences*/
+                loadMovieData(getPreferredSortingCriterion(this));
+            }
+        }else {
+            mMovieList = savedInstanceState.getParcelableArrayList(getString(R.string.movie_list_key));
+        }
+
         // Initialize a loader or re use the already started one if it exists
         /* Connect the activity whit le Loader life cycle  */
-        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
+//        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
     }
 
     @Override
@@ -130,8 +133,17 @@ public class MainActivity extends AppCompatActivity
      * @param queryKey determine the sorting criterion of the movies data
      */
     private void loadMovieData(String queryKey){
-        URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
-        new FetchMovieTask().execute(theMovieDBSearchURL);
+        if ((queryKey.equals(getString(R.string.criterion_popular)))
+                || (queryKey.equals(getString(R.string.criterion_most_rated)))){
+            URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
+            new FetchMoviesTask().execute(theMovieDBSearchURL);
+        }else if (queryKey.equals(getString(R.string.criterion_favorite))){
+            // Initialize a loader or re use the already started one if it exists
+        /* Connect the activity whit le Loader life cycle  */
+            getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
+        }
+
+
 
 
     }
@@ -212,7 +224,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
-        mMovieAdapter.swapCursor(null, posterResolution);
+        mMovieAdapter.swapMovieList(null, posterResolution);
     }
 
     /**
@@ -225,7 +237,7 @@ public class MainActivity extends AppCompatActivity
          */
         @Override
         protected void onPreExecute() {
-            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
+//            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
             super.onPreExecute();
 
         }
@@ -268,6 +280,60 @@ public class MainActivity extends AppCompatActivity
 
 
 
+            } else {
+                showErrorMessage();
+            }
+        }
+    }
+
+    public class FetchMoviesTask extends AsyncTask<URL,Void,ArrayList<Movie>>{
+        /**
+         * Flushing the existing data base
+         */
+        @Override
+        protected void onPreExecute() {
+            mMovieList = null;
+            super.onPreExecute();
+
+        }
+
+        /**
+         * Fetching a JSON containing the data from the internet using NetworkUtils and then
+         * factoring it into an ArrayList<Movie>
+         *
+         * @param params containing the URL to perform the search on internet
+         * @return dataFromJson the ArrayList<Movie> containing the movies data
+         */
+        @Override
+        protected ArrayList<Movie> doInBackground(URL... params) {
+            URL searchURL = params[0];
+            String jsonMovieDBResults;
+            try {
+                jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
+           /*MovieDBJsonUtils.getMovieArrayLIsFromJson returns an ArrayList<Movie>
+                 whit all the data extracted from the Json*/
+                return MovieDBJsonUtils.getMovieArrayListFromJson(jsonMovieDBResults);
+            } catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+
+
+        }
+
+        /**
+         * Filling the database with movieData.
+         * Emptiness of movieData indicated a internet connection problem
+         * or an unusable JSON return from the internet query
+         * @param movieData the movies data
+         */
+        @Override
+        protected void onPostExecute(ArrayList<Movie> movieData) {
+            if(movieData != null){
+                mMovieList = movieData;
+                String posterResolution = MoviePreferences
+                        .getPreferredPosterResolution(MainActivity.this);
+                mMovieAdapter.swapMovieList(mMovieList,posterResolution);
             } else {
                 showErrorMessage();
             }
@@ -325,6 +391,38 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        switch (menuItemThatWhatSelected){
+            case R.id.action_sort_by_popularity: {
+                if (!(oldPreference.equals(getString(R.string.criterion_popular)))) {
+                    MoviePreferences.setPreferredSortingCriterion(context, getString(R.string.criterion_popular));
+                    message = getString(R.string.toast_popular_sort);
+                    mToast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+                    mToast.show();
+                    preferenceChanged = true;
+                }
+                break;
+            }
+            case R.id.action_sort_by_rate: {
+                if (!(oldPreference.equals(getString(R.string.criterion_most_rated)))){
+                    MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_most_rated));
+                    message = getString(R.string.toast_rate_sort);
+                    mToast = Toast.makeText(context,message,Toast.LENGTH_LONG);
+                    mToast.show();
+                    preferenceChanged = true;
+                }
+                break;
+            }
+            case R.id.action_display_favorites: {
+                if (!(oldPreference.equals(getString(R.string.criterion_favorite)))){
+                    MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_favorite));
+                    message = getString(R.string.toast_display_favorites);
+                    mToast = Toast.makeText(context,message,Toast.LENGTH_LONG);
+                    mToast.show();
+                    preferenceChanged = true;
+                }
+            }
+        }
+
         // Only if changes are needed, load the new data in the data base and restart the loader
         if (preferenceChanged){
             MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
@@ -333,7 +431,7 @@ public class MainActivity extends AppCompatActivity
             mMovieListRecyclerView.setAdapter(mMovieAdapter);
 
             // restarting the loader
-            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+//            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
             return true;
 
         }else {
@@ -352,9 +450,9 @@ public class MainActivity extends AppCompatActivity
      * @param movieIdInteger the internet Id of the particular movie the user focused on
      */
     @Override
-    public void onListItemClick(int movieIdInteger) {
+    public void onListItemClick(long movieIdInteger) {
         //Casting the id into a string and building the query uri
-        String movieIdString = Integer.toString(movieIdInteger);
+        String movieIdString = Long.toString(movieIdInteger);
 
         Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
                 .appendPath(movieIdString)

@@ -7,6 +7,7 @@
 
     <string name="criterion_popular">popular</string>
     <string name="criterion_most_rated">rate</string>
+    <string name="criterion_favorite">favorite</string>
 
 
     <string name="sort">Sort</string>
@@ -22,6 +23,7 @@
     <string name="action_sort">Sort</string>
     <string name="action_popular">By Popularity</string>
     <string name="action_rate">By Rate</string>
+    <string name="action_favorite">Favorites</string>
 
 
     <!-- - - - - - - - - - -
@@ -31,6 +33,7 @@
     <string name="toast_sort">Sort clicked</string>
     <string name="toast_popular_sort">Sorting by popularity</string>
     <string name="toast_rate_sort">Sorting by rate</string>
+    <string name="toast_display_favorites">Displaying favorites</string>
     <string name="toast_no_sort_needed">Already sorted that way</string>
     <string name="toast_empty_cursor">Unexpected empty cursor</string>
     <string name="toast_querying_for_a_movie">Looking for a movie</string>

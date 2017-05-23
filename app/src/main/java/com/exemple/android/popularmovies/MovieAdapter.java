@@ -9,10 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * MovieAdapter exposes a list of movie poster from a Cursor containing the path to those posters
@@ -28,6 +31,8 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     private final ListItemClickListener mOnClickListener;
 
     private Cursor mCursor;
+
+    private List<Movie> mMovieList;
 
     /**
      * Constructor
@@ -70,9 +75,11 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
 
-        mCursor.moveToPosition(position);
+//        mCursor.moveToPosition(position);
+        Movie currentMovie = mMovieList.get(position);
 
-        String pathToPoster =mCursor.getString(MainActivity.INDEX_MOVIE_POSTER);
+//        String pathToPoster =mCursor.getString(MainActivity.INDEX_MOVIE_POSTER);
+        String pathToPoster = currentMovie.getPosterPath();
         movieAdapterViewHolder.bind(pathToPoster);
 
     }
@@ -91,17 +98,29 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     /**
      * Change the content of the cursor.
      *
-     * @param cursor newCursor the new cursor to use as ForecastAdapter's data source
+     * @param newCursor the new cursor to use as ForecastAdapter's data source
      * @param posterSize the argument used to choose the poster resolution
      *                   we get with the Picasso methods
      */
 
-    void swapCursor(Cursor cursor, String posterSize){
-        mCursor = cursor;
+    void swapCursor(Cursor newCursor, String posterSize){
+        mCursor = newCursor;
         mPosterSize = posterSize;
         notifyDataSetChanged();
     }
 
+    /**
+     * Change the content of the movie list
+     *
+     * @param newMovieList the new movie list to use as ForecastAdapter's data source
+     * @param posterSize the argument used to choose the poster resolution
+     *                   we get with the Picasso methods
+     */
+    void swapMovieList(ArrayList<Movie> newMovieList, String posterSize){
+        mMovieList = newMovieList;
+        mPosterSize = posterSize;
+        notifyDataSetChanged();
+    }
     /**
      * The view holder. Behave as a cache of the child view for the movies poster.
      * We also set ab OnClickListener here.
@@ -133,8 +152,10 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            mCursor.moveToPosition(clickedPosition);
-            int movieIdInteger = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
+            Movie currentMovie = mMovieList.get(clickedPosition);
+//            mCursor.moveToPosition(clickedPosition);
+//            int movieIdInteger = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
+            long movieIdInteger = currentMovie.getMovieId();
             mOnClickListener.onListItemClick(movieIdInteger);
         }
     }
@@ -143,7 +164,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
    /* The interface that receives onClick messages*/
 
     interface ListItemClickListener {
-        void onListItemClick(int movieIdInteger);
+        void onListItemClick(long movieIdInteger);
 
     }
 }

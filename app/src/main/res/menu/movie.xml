@@ -12,4 +12,10 @@
         android:id="@+id/action_sort_by_rate"
         android:orderInCategory="2"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:title="@string/action_favorite"
+        android:id="@+id/action_display_favorites"
+        android:orderInCategory="3"
+        app:showAsAction="ifRoom" />
 </menu>
