@@ -15,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
+import com.exemple.android.popularmovies.utilities.MovieUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.exemple.android.popularmovies.R.menu.movie;
 import static com.exemple.android.popularmovies.data.MoviePreferences.getPreferredSortingCriterion;
 
 /*
@@ -69,6 +72,10 @@ public class MainActivity extends AppCompatActivity
      *********************/
     public static final String[] MAIN_MOVIE_PROJECTION = {
             MovieListContract.MovieListEntry.COLUMN_POSTER_PATH,
+            MovieListContract.MovieListEntry.COLUMN_OVERVIEW,
+            MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE,
+            MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE,
+            MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE,
             MovieListContract.MovieListEntry.COLUMN_MOVIE_ID,
     };
 
@@ -76,7 +83,11 @@ public class MainActivity extends AppCompatActivity
      ** INDEX **
      ***********/
     public static final int INDEX_MOVIE_POSTER = 0;
-    public static final int INDEX_MOVIE_ID = 1;
+    public static final int INDEX_MOVIE_OVERVIEW = 1;
+    public static final int INDEX_MOVIE_RELEASE_DATE = 2;
+    public static final int INDEX_MOVIE_ORIGINAL_TITLE = 3;
+    public static final int INDEX_MOVIE_VOTE_AVERAGE = 4;
+    public static final int INDEX_MOVIE_MOVIE_ID = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +122,15 @@ public class MainActivity extends AppCompatActivity
          /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
          to get the actual criterion saved in the preferences*/
                 loadMovieData(getPreferredSortingCriterion(this));
+            } else {
+                showErrorMessage();
             }
         }else {
             mMovieList = savedInstanceState.getParcelableArrayList(getString(R.string.movie_list_key));
+            String posterResolution = MoviePreferences
+                    .getPreferredPosterResolution(MainActivity.this);
+            mMovieAdapter.swapMovieList(mMovieList,posterResolution);
+            showDataView();
         }
 
         // Initialize a loader or re use the already started one if it exists
@@ -136,10 +153,13 @@ public class MainActivity extends AppCompatActivity
         if ((queryKey.equals(getString(R.string.criterion_popular)))
                 || (queryKey.equals(getString(R.string.criterion_most_rated)))){
             URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
+            Log.i("LoadMovieData", "popular or rated movie");
             new FetchMoviesTask().execute(theMovieDBSearchURL);
+
         }else if (queryKey.equals(getString(R.string.criterion_favorite))){
             // Initialize a loader or re use the already started one if it exists
         /* Connect the activity whit le Loader life cycle  */
+            Log.i("LoadMovieData", "favorite movies");
             getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
         }
 
@@ -152,6 +172,7 @@ public class MainActivity extends AppCompatActivity
      * Showing the recycler view
      */
     private void showDataView(){
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.INVISIBLE);
         mMovieListRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -161,6 +182,7 @@ public class MainActivity extends AppCompatActivity
      * Showing an error message
      */
     private void showErrorMessage(){
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
         mMovieListRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageTextView.setVisibility(View.VISIBLE);
     }
@@ -207,12 +229,16 @@ public class MainActivity extends AppCompatActivity
         // It turns out the features are not implemented yet and I let myself that door open
         String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
 
-        mMovieAdapter.swapCursor(data, posterResolution);
+        mMovieList = MovieUtils.getArrayListFromCursor(data);
+//        mMovieAdapter.swapCursor(data, posterResolution);
+        mMovieAdapter.swapMovieList(mMovieList,posterResolution);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
 
         mMovieListRecyclerView.smoothScrollToPosition(mPosition);
 
-        if (data.getCount() != 0) showDataView();
+       if (data.getCount() != 0){
+           showDataView();
+       } else Log.i("onLoadFinished", "data.getCount() = 0");
 
 
     }
@@ -293,6 +319,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             mMovieList = null;
+            Log.i("FetchMoviesTask", "PreExecute");
             super.onPreExecute();
 
         }
@@ -330,11 +357,14 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(ArrayList<Movie> movieData) {
             if(movieData != null){
+                Log.i("FetchMoviesTask", "movieData != null");
                 mMovieList = movieData;
                 String posterResolution = MoviePreferences
                         .getPreferredPosterResolution(MainActivity.this);
                 mMovieAdapter.swapMovieList(mMovieList,posterResolution);
+                showDataView();
             } else {
+                Log.i("FetchMoviesTask", "movieData = null");
                 showErrorMessage();
             }
         }
@@ -350,7 +380,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.movie,menu);
+        getMenuInflater().inflate(movie,menu);
 
         return true;
     }
@@ -425,10 +455,11 @@ public class MainActivity extends AppCompatActivity
 
         // Only if changes are needed, load the new data in the data base and restart the loader
         if (preferenceChanged){
-            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
-            loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
+//            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
             mMovieAdapter = new MovieAdapter(this,this);
             mMovieListRecyclerView.setAdapter(mMovieAdapter);
+            loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
+
 
             // restarting the loader
 //            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
@@ -470,6 +501,7 @@ public class MainActivity extends AppCompatActivity
      * Show a loading indicator, hiding the data view
      */
     private void showLoadingIndicator(){
+        mErrorMessageTextView.setVisibility(View.INVISIBLE);
         mMovieListRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }

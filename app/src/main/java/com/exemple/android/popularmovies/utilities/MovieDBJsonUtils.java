@@ -2,6 +2,7 @@ package com.exemple.android.popularmovies.utilities;
 
 
 import android.content.ContentValues;
+import android.util.Log;
 
 import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieListContract;
@@ -109,10 +110,12 @@ public class MovieDBJsonUtils {
             voteAverage = movie.getDouble(MDB_VOTE_AVERAGE);
             movieId = movie.getInt(MDB_MOVIE_ID);
 
+            Log.i("MovieDBJsonUils ", originalTitle);
+
             Movie movieData = new Movie();
             movieData.setPosterPath(posterPath);
             movieData.setOverview(overview);
-            movieData.setRelease_date(release_date);
+            movieData.setReleaseDate(release_date);
             movieData.setOriginalTitle(originalTitle);
             movieData.setVoteAverage(voteAverage);
             movieData.setMovieId(movieId);

@@ -10,7 +10,7 @@ public class Movie implements Parcelable {
 
     private String posterPath;
     private String overview;
-    private String release_date;
+    private String releaseDate;
     private String originalTitle;
     private double voteAverage;
     private long movieId;
@@ -41,7 +41,7 @@ public class Movie implements Parcelable {
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(this.posterPath);
         parcel.writeString(this.overview);
-        parcel.writeString(this.release_date);
+        parcel.writeString(this.releaseDate);
         parcel.writeString(this.originalTitle);
         parcel.writeDouble(this.voteAverage);
         parcel.writeLong(this.movieId);
@@ -56,7 +56,7 @@ public class Movie implements Parcelable {
     protected Movie(Parcel in){
         this.posterPath = in.readString();
         this.overview = in.readString();
-        this.release_date = in.readString();
+        this.releaseDate = in.readString();
         this.originalTitle = in.readString();
         this.voteAverage = in.readDouble();
         this.movieId = in.readLong();
@@ -110,12 +110,12 @@ public class Movie implements Parcelable {
         this.overview = overview;
     }
 
-    public String getRelease_date() {
-        return release_date;
+    public String getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setRelease_date(String release_date) {
-        this.release_date = release_date;
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     public String getOriginalTitle() {
