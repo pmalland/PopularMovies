@@ -1,5 +1,6 @@
 package com.exemple.android.popularmovies.utilities;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.exemple.android.popularmovies.data.Movie;
@@ -43,5 +44,17 @@ public class MovieUtils {
         }
 
         return movieArrayList;
+    }
+
+    public static ContentValues getContentValuesFromMovie(Movie movie){
+
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieListContract.MovieListEntry.COLUMN_POSTER_PATH,movie.getPosterPath());
+        movieValues.put(MovieListContract.MovieListEntry.COLUMN_OVERVIEW,movie.getOverview());
+        movieValues.put(MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE,movie.getReleaseDate());
+        movieValues.put(MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE,movie.getOriginalTitle());
+        movieValues.put(MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE,movie.getVoteAverage());
+        movieValues.put(MovieListContract.MovieListEntry.COLUMN_MOVIE_ID,movie.getMovieId());
+        return movieValues;
     }
 }

@@ -1,5 +1,6 @@
 package com.exemple.android.popularmovies.data;
 
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -39,5 +40,11 @@ public class MovieListContract {
         /*Stored as an integer in data base. It contains the movie ID on internet*/
         public static final String COLUMN_MOVIE_ID ="movieId";
 
+
+        public static final Uri buildMovieUri(long id){
+            return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
     }
+
+
 }

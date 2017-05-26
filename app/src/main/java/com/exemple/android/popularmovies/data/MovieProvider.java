@@ -1,6 +1,7 @@
 package com.exemple.android.popularmovies.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -175,12 +176,36 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Insert a single row in the data base
-     * Not Used in our implementation
+     *
+     * @param uri URI of the insertion request
+     * @param contentValues to be added to the database
+     * @return the uri where the value had been inserted
      */
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
-        return null;
+
+        final SQLiteDatabase db = mMovieHelper.getWritableDatabase();
+        Uri returnUri;
+
+        switch (sUriMatcher.match(uri)) {
+            case CODE_MOVIES: {
+
+                long id = db.insert(MovieListContract.MovieListEntry.TABLE_NAME, null, contentValues);
+                if (id > 0) {
+                    returnUri = MovieListContract.MovieListEntry.buildMovieUri(id);
+                } else {
+                    throw new android.database.SQLException("Failed to insert row into: " + uri);
+                }
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("Unknown uri:" + uri);
+            }
+        }
+        getContext().getContentResolver().notifyChange(uri,null);
+        return returnUri;
+
     }
 
     /**
@@ -207,6 +232,13 @@ public class MovieProvider extends ContentProvider {
                 rowDeletedCount = db.delete(MovieListContract.MovieListEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
+                break;
+            }
+            case CODE_MOVIES_WITH_ID: {
+                String movieId = String.valueOf(ContentUris.parseId(uri));
+                rowDeletedCount = db.delete(MovieListContract.MovieListEntry.TABLE_NAME,
+                        MovieListContract.MovieListEntry.COLUMN_MOVIE_ID + " = ? ",
+                        new String[]{movieId});
                 break;
             }
             default:

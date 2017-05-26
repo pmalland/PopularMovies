@@ -21,7 +21,7 @@ public class MovieListDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "movielist.db";
 
     /* Data base version */
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 1;
 
     public MovieListDbHelper(Context context){
         super(context,DATABASE_NAME,null,DATABASE_VERSION);
@@ -37,13 +37,14 @@ public class MovieListDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_MOVIELIST_TABLE = "CREATE TABLE " +
                 MovieListContract.MovieListEntry.TABLE_NAME + " (" +
-                MovieListContract.MovieListEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                COLUMN_POSTER_PATH + " TEXT NOT NULL," +
-                COLUMN_OVERVIEW + " TEXT NOT NULL," +
-                COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
-                COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL," +
-                COLUMN_VOTE_AVERAGE + " REAL NOT NULL," +
-                COLUMN_MOVIE_ID + " INTEGER NOT NULL" +
+                MovieListContract.MovieListEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
+                COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
+                COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
+                COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
+                COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                "UNIQUE (" + COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE" +
                 ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIELIST_TABLE);
