@@ -65,7 +65,7 @@ public class Movie implements Parcelable {
     /**
      * Public CREATOR field that generates instances of your Parcelable class from a Parcel.
      */
-    public final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){
         /**
          * Create a new instance of the Parcelable class,
          * instantiating it from the given Parcel whose data had previously been written

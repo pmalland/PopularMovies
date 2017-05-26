@@ -12,9 +12,10 @@
 
     <string name="sort">Sort</string>
 
-    <string name="content_authority">com.exemple.android.popularmovies</string>
+    <string name="content_authority" translatable="false">com.exemple.android.popularmovies</string>
 
-    <string name="movie_list_key">movieList</string>
+    <string name="movie_list_key" translatable="false">movieList</string>
+    <string name="parcelable_movie_key" translatable="false">parcelable_movie</string>
 
     <!-- - - - - - - - - - - - - - -
       - Used in the action bar  -
@@ -41,7 +42,7 @@
     <!-- - - - - - - - - - - - - -
       - Used in NetworkUtils  -
       - - - - - - - - - - - - - -->
-    <string name="themoviedb_base_url">http://api.themoviedb.org/3</string>
+    <string name="themoviedb_base_url" translatable="false">http://api.themoviedb.org/3</string>
 
 
     <!-- - - - - - - - - - - -

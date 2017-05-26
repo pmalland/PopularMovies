@@ -8,10 +8,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
@@ -63,6 +65,7 @@ public class DetailActivity extends AppCompatActivity
 //    public static final int INDEX_MOVIE_MOVIE_ID = 5;
 
     private Uri mMovieDetailUri;
+    private Movie mMovie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,12 +79,28 @@ public class DetailActivity extends AppCompatActivity
         /*Retrieving the needed uri to find the data we want to display*/
         Intent triggeringIntent = getIntent();
         if (triggeringIntent != null) {
-            mMovieDetailUri = triggeringIntent.getData();
+            Log.i("DetailOnCreate","triggeringIntent != null");
+//            mMovieDetailUri = triggeringIntent.getData();
+            try {
+                mMovie = (Movie) triggeringIntent.getExtras().getParcelable(getString(R.string.parcelable_movie_key));
+            } catch (NullPointerException e){
+                e.printStackTrace();
+            }
+            Log.i("DetailOnCreate","getParcelableExtra");
         }
-        if(mMovieDetailUri == null) throw new NullPointerException("Movie ID for DetailActivity cannot be null");
+        if(mMovie == null) throw new NullPointerException("Movie ID for DetailActivity cannot be null");
+        Log.i("DetailOnCreate","mMovie != null");
+        /* Binding party*/
+        mOriginalTitleTextView.setText(mMovie.getOriginalTitle());
+        bind(mMovie.getPosterPath());
+        mReleaseDateTextView.setText(mMovie.getReleaseDate());
+        String rate = Double.toString(mMovie.getVoteAverage()) + "/10";
+        mRateTextView.setText(rate);
+        mOverviewTextView.setText(mMovie.getOverview());
+
 
         /* Connect the activity whit le Loader life cycle  */
-        getSupportLoaderManager().initLoader(ID_DETAIL_LOADER,null,this);
+//        getSupportLoaderManager().initLoader(ID_DETAIL_LOADER,null,this);
     }
 
     /**

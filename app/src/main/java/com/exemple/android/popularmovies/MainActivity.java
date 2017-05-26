@@ -153,13 +153,11 @@ public class MainActivity extends AppCompatActivity
         if ((queryKey.equals(getString(R.string.criterion_popular)))
                 || (queryKey.equals(getString(R.string.criterion_most_rated)))){
             URL theMovieDBSearchURL = NetworkUtils.buildUrl(queryKey);
-            Log.i("LoadMovieData", "popular or rated movie");
             new FetchMoviesTask().execute(theMovieDBSearchURL);
 
         }else if (queryKey.equals(getString(R.string.criterion_favorite))){
             // Initialize a loader or re use the already started one if it exists
         /* Connect the activity whit le Loader life cycle  */
-            Log.i("LoadMovieData", "favorite movies");
             getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
         }
 
@@ -319,7 +317,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             mMovieList = null;
-            Log.i("FetchMoviesTask", "PreExecute");
             super.onPreExecute();
 
         }
@@ -357,14 +354,12 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(ArrayList<Movie> movieData) {
             if(movieData != null){
-                Log.i("FetchMoviesTask", "movieData != null");
                 mMovieList = movieData;
                 String posterResolution = MoviePreferences
                         .getPreferredPosterResolution(MainActivity.this);
                 mMovieAdapter.swapMovieList(mMovieList,posterResolution);
                 showDataView();
             } else {
-                Log.i("FetchMoviesTask", "movieData = null");
                 showErrorMessage();
             }
         }
@@ -481,20 +476,23 @@ public class MainActivity extends AppCompatActivity
      * @param movieIdInteger the internet Id of the particular movie the user focused on
      */
     @Override
-    public void onListItemClick(long movieIdInteger) {
+    public void onListItemClick(int clickedPosition) {
         //Casting the id into a string and building the query uri
-        String movieIdString = Long.toString(movieIdInteger);
+//        String movieIdString = Long.toString(movieIdInteger);
+        Movie currentMovie = mMovieList.get(clickedPosition);
+//        Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
+//                .appendPath(movieIdString)
+//                .build();
+        if (currentMovie != null) {
+            // Assembling the Intent to DetailActivity
+            Log.i("onListItemClick",currentMovie.getOriginalTitle());
+            Intent startDetailActivityIntent = new Intent(MainActivity.this, DetailActivity.class);
+            startDetailActivityIntent.putExtra(getString(R.string.parcelable_movie_key), currentMovie);
+//        startDetailActivityIntent.setData(detailUri);
 
-        Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
-                .appendPath(movieIdString)
-                .build();
+            startActivity(startDetailActivityIntent);
 
-        // Assembling the Intent to DetailActivity
-        Intent startDetailActivityIntent = new Intent(MainActivity.this, DetailActivity.class);
-
-        startDetailActivityIntent.setData(detailUri);
-
-        startActivity(startDetailActivityIntent);
+        }
     }
 
     /**

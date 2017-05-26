@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
 
 //        String pathToPoster =mCursor.getString(MainActivity.INDEX_MOVIE_POSTER);
         String pathToPoster = currentMovie.getPosterPath();
+        Log.i("OnBinvViewHolder ", pathToPoster);
         movieAdapterViewHolder.bind(pathToPoster);
 
     }
@@ -87,12 +89,12 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     /**
      * Returns the number of items to display
      *
-     * @return the number of items available in our forecast
+     * @return the number of items available in our ArrayList<Movie>
      */
     @Override
     public int getItemCount() {
-        if (null == mCursor) return 0;
-        return mCursor.getCount();
+        if (null == mMovieList) return 0;
+        return mMovieList.size();
     }
 
     /**
@@ -140,6 +142,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
 
         /*Binding the movie poster to his image view with the Picasso library*/
         void bind (String pathToImage){
+            Log.i("AdapterBind ",pathToImage);
             URL urlToFirstPoster = NetworkUtils.buildURL(pathToImage, mPosterSize);
             Picasso.with(mContext)
                     .load(urlToFirstPoster.toString())
@@ -152,11 +155,11 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            Movie currentMovie = mMovieList.get(clickedPosition);
+//            Movie currentMovie = mMovieList.get(clickedPosition);
 //            mCursor.moveToPosition(clickedPosition);
 //            int movieIdInteger = mCursor.getInt(MainActivity.INDEX_MOVIE_ID);
-            long movieIdInteger = currentMovie.getMovieId();
-            mOnClickListener.onListItemClick(movieIdInteger);
+//            long movieIdInteger = currentMovie.getMovieId();
+            mOnClickListener.onListItemClick(clickedPosition);
         }
     }
 
@@ -164,7 +167,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
    /* The interface that receives onClick messages*/
 
     interface ListItemClickListener {
-        void onListItemClick(long movieIdInteger);
+        void onListItemClick(int clickedPosition);
 
     }
 }
