@@ -15,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -112,6 +113,9 @@ public class MainActivity extends AppCompatActivity
         mMovieListRecyclerView.setAdapter(mMovieAdapter);
 
         ButterKnife.bind(this);
+        /* Attach a ItemTouchHelper to the RecyclerView to recognize when a user swipes to delete a Movie
+          from the favorite database. */
+        addItemTouchHelper();
 
         showLoadingIndicator();
 
@@ -437,7 +441,7 @@ public class MainActivity extends AppCompatActivity
             String newCriterion = MoviePreferences.getPreferredSortingCriterion(this);
             mMovieAdapter = new MovieAdapter(this,this);
             mMovieListRecyclerView.setAdapter(mMovieAdapter);
-            loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
+            loadMovieData(newCriterion);
 
             if (newCriterion.equals(getString(R.string.criterion_favorite))) {
 //             restarting the loader
@@ -500,5 +504,47 @@ public class MainActivity extends AppCompatActivity
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    /**
+     * Adding an ItemTouchHelper to manage the swipe action. We make sure that it works only
+     * on the favorite screen
+     */
+    private void addItemTouchHelper(){
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT){
+            /* onMove is not used in our implementation*/
+            @Override
+            public boolean onMove(RecyclerView recyclerView,
+                                  RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            /**
+             * Called when a user swipes left or right on a ViewHolder
+             * @param viewHolder corresponding to the item clicked
+             * @param direction the swipe direction
+             */
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                /*Calling delete on data base only if we are on the favorite screen*/
+                String sortCriterion = MoviePreferences
+                        .getPreferredSortingCriterion(MainActivity.this);
+                if(sortCriterion.equals(getString(R.string.criterion_favorite))) {
+
+                /* Retrieve the id of the movie to delete. The tag was set to the
+                 * MovieId in the MovieAdapter.onBindViewHolder */
+                    long movieIdLong = (long) viewHolder.itemView.getTag();
+                    Uri deleteQueryUri = MovieListContract.MovieListEntry.buildMovieUri(movieIdLong);
+
+                    getContentResolver().delete(deleteQueryUri, null, null);
+
+                    getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER, null, MainActivity.this);
+                }
+            }
+        }
+        ).attachToRecyclerView(mMovieListRecyclerView);
     }
 }

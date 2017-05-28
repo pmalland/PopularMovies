@@ -78,6 +78,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
 
 //        mCursor.moveToPosition(position);
         Movie currentMovie = mMovieList.get(position);
+        movieAdapterViewHolder.itemView.setTag(currentMovie.getMovieId());
 
 //        String pathToPoster =mCursor.getString(MainActivity.INDEX_MOVIE_POSTER);
         String pathToPoster = currentMovie.getPosterPath();

@@ -1,19 +1,20 @@
 package com.exemple.android.popularmovies.data;
 
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Review implements Parcelable{
+import java.util.List;
 
-    private String id;
-    private String author;
-    private String content;
+public class MovieDetails implements Parcelable{
+
+    public Movie movie;
+    public List<Review> reviews =  null;
+    public Video video;
 
     /**
      * Public constructor
      */
-    public Review(){}
+    public MovieDetails(){}
 
     /**
      * It's a bit mask. We don't use it in our implementation.
@@ -34,9 +35,9 @@ public class Review implements Parcelable{
      */
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeString(this.id);
-        parcel.writeString(this.author);
-        parcel.writeString(this.content);
+        parcel.writeValue(this.movie);
+        parcel.writeList(this.reviews);
+        parcel.writeValue(this.video);
     }
 
     /**
@@ -45,16 +46,16 @@ public class Review implements Parcelable{
      *
      * @param in the parcel
      */
-    protected Review(Parcel in){
-        this.id = in.readString();
-        this.author = in.readString();
-        this.content = in.readString();
+    protected MovieDetails(Parcel in){
+        this.movie = (Movie) in.readValue(Movie.class.getClassLoader());
+        in.readList(this.reviews, Review.class.getClassLoader());
+        this.video = (Video) in.readValue(Video.class.getClassLoader());
     }
 
     /**
      * Public CREATOR field that generates instances of your Parcelable class from a Parcel.
      */
-    public static final Parcelable.Creator<Review> CREATOR = new Parcelable.Creator<Review>(){
+    public static final Parcelable.Creator<MovieDetails> CREATOR = new Parcelable.Creator<MovieDetails>(){
 
         /**
          * Create a new instance of the Parcelable class,
@@ -65,8 +66,8 @@ public class Review implements Parcelable{
          * @return the new instance
          */
         @Override
-        public Review createFromParcel(Parcel parcel) {
-            return new Review(parcel);
+        public MovieDetails createFromParcel(Parcel parcel) {
+            return new MovieDetails(parcel);
         }
 
         /**
@@ -75,8 +76,8 @@ public class Review implements Parcelable{
          * @return the new array
          */
         @Override
-        public Review[] newArray(int size) {
-            return new Review[size];
+        public MovieDetails[] newArray(int size) {
+            return new MovieDetails[size];
         }
     };
 
@@ -84,27 +85,27 @@ public class Review implements Parcelable{
      ** THE ACCESSORS **
      *******************/
 
-    public String getAuthor() {
-        return author;
+    public Movie getMovie() {
+        return movie;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setMovie(Movie movie) {
+        this.movie = movie;
     }
 
-    public String getContent() {
-        return content;
+    public List<Review> getReviews() {
+        return reviews;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 
-    public String getId() {
-        return id;
+    public Video getVideo() {
+        return video;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setVideo(Video video) {
+        this.video = video;
     }
 }
