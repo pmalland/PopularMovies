@@ -1,5 +1,6 @@
 package com.exemple.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -8,7 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
+import com.exemple.android.popularmovies.utilities.MovieUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
@@ -31,11 +34,14 @@ public class DetailActivity extends AppCompatActivity
     /************************
      ** VIEWS REFERENCES **
      ************************/
+
+    /* Using ButterKnife libraries*/
     @BindView(R.id.original_title_tv) TextView mOriginalTitleTextView;
     @BindView(R.id.movie_thumbnail_iv) ImageView mThumbnailImageView;
     @BindView(R.id.movie_release_tv) TextView mReleaseDateTextView;
     @BindView(R.id.movie_rate_tv) TextView mRateTextView;
     @BindView(R.id.overview_tv) TextView mOverviewTextView;
+    @BindView(R.id.bt_favorite) Button mFavoriteButton;
 
     /************************
      ** DETAILS LOADER ID **
@@ -66,30 +72,30 @@ public class DetailActivity extends AppCompatActivity
 
     private Uri mMovieDetailUri;
     private Movie mMovie;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /* In this activity we query the data base
+        /* We retrieve a Movie from the Intent and look for
          for the details of the selected movie and display it       */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
         ButterKnife.bind(this);
 
-        /*Retrieving the needed uri to find the data we want to display*/
+        /*Retrieving the needed Movie to get the data we want to display*/
         Intent triggeringIntent = getIntent();
         if (triggeringIntent != null) {
-            Log.i("DetailOnCreate","triggeringIntent != null");
-//            mMovieDetailUri = triggeringIntent.getData();
+
             try {
-                mMovie = (Movie) triggeringIntent.getExtras().getParcelable(getString(R.string.parcelable_movie_key));
+                mMovie = triggeringIntent.getExtras().getParcelable(getString(R.string.parcelable_movie_key));
             } catch (NullPointerException e){
                 e.printStackTrace();
             }
-            Log.i("DetailOnCreate","getParcelableExtra");
+
         }
-        if(mMovie == null) throw new NullPointerException("Movie ID for DetailActivity cannot be null");
-        Log.i("DetailOnCreate","mMovie != null");
+        if(mMovie == null) throw new NullPointerException("Failed to pass Movie via Intent");
+
         /* Binding party*/
         mOriginalTitleTextView.setText(mMovie.getOriginalTitle());
         bind(mMovie.getPosterPath());
@@ -98,6 +104,7 @@ public class DetailActivity extends AppCompatActivity
         mRateTextView.setText(rate);
         mOverviewTextView.setText(mMovie.getOverview());
 
+        addButtonClickListener();
 
         /* Connect the activity whit le Loader life cycle  */
 //        getSupportLoaderManager().initLoader(ID_DETAIL_LOADER,null,this);
@@ -174,5 +181,30 @@ public class DetailActivity extends AppCompatActivity
                 .error(R.drawable.ic_error_black_48dp)
                 .into(mThumbnailImageView);
 
+    }
+
+    /**
+     * Our OnClickListener for mFavoriteButton
+     * the "UNIQUE (" + COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE" on the database settings
+     * should deal with the doubles
+     */
+    void addButtonClickListener(){
+
+        mFavoriteButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+
+                ContentValues movieContentValues = MovieUtils.getContentValuesFromMovie(mMovie);
+                Uri uri = getApplicationContext().getContentResolver()
+                        .insert(MovieListContract.MovieListEntry.CONTENT_URI,movieContentValues);
+
+                if(mToast != null){
+                    mToast.cancel();
+                }
+                String message = getString(R.string.toast_marked_as_favorite);
+                mToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+                mToast.show();
+            }
+
+        });
     }
 }

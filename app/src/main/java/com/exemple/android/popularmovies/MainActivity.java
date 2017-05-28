@@ -247,8 +247,9 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
-        mMovieAdapter.swapMovieList(null, posterResolution);
+//        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
+//        mMovieAdapter.swapMovieList(null, posterResolution);
+        Log.i("onLoadReset", "called");
     }
 
     /**
@@ -261,7 +262,8 @@ public class MainActivity extends AppCompatActivity
          */
         @Override
         protected void onPreExecute() {
-//            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
+//            MainActivity.this.getContentResolver()
+//              .delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
             super.onPreExecute();
 
         }
@@ -299,7 +301,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(ContentValues[] movieData) {
             if(movieData != null){
-                MainActivity.this.getContentResolver().bulkInsert(MovieListContract.MovieListEntry.CONTENT_URI,movieData);
+                MainActivity.this.getContentResolver()
+                        .bulkInsert(MovieListContract.MovieListEntry.CONTENT_URI,movieData);
 
 
 
@@ -397,25 +400,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         //Check if we are already displaying the wright data
-        if(menuItemThatWhatSelected == R.id.action_sort_by_popularity){
-            if (!(oldPreference.equals(getString(R.string.criterion_popular)))) {
-                MoviePreferences.setPreferredSortingCriterion(context, getString(R.string.criterion_popular));
-                message = getString(R.string.toast_popular_sort);
-                mToast = Toast.makeText(context, message, Toast.LENGTH_LONG);
-                mToast.show();
-                preferenceChanged = true;
-            }
-
-        }else if(menuItemThatWhatSelected == R.id.action_sort_by_rate){
-            if (!(oldPreference.equals(getString(R.string.criterion_most_rated)))){
-                MoviePreferences.setPreferredSortingCriterion(context,getString(R.string.criterion_most_rated));
-                message = getString(R.string.toast_rate_sort);
-                mToast = Toast.makeText(context,message,Toast.LENGTH_LONG);
-                mToast.show();
-                preferenceChanged = true;
-            }
-        }
-
         switch (menuItemThatWhatSelected){
             case R.id.action_sort_by_popularity: {
                 if (!(oldPreference.equals(getString(R.string.criterion_popular)))) {
@@ -450,14 +434,15 @@ public class MainActivity extends AppCompatActivity
 
         // Only if changes are needed, load the new data in the data base and restart the loader
         if (preferenceChanged){
-//            MainActivity.this.getContentResolver().delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
+            String newCriterion = MoviePreferences.getPreferredSortingCriterion(this);
             mMovieAdapter = new MovieAdapter(this,this);
             mMovieListRecyclerView.setAdapter(mMovieAdapter);
             loadMovieData(MoviePreferences.getPreferredSortingCriterion(this));
 
-
-            // restarting the loader
-//            getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER,null,this);
+            if (newCriterion.equals(getString(R.string.criterion_favorite))) {
+//             restarting the loader
+                getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER, null, this);
+            }
             return true;
 
         }else {
@@ -471,14 +456,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Responding to clicks on our list.
+     * Responding to clicks on our list. Pick the wright Movie and build an Intent to start
+     * DetailActivity
      *
-     * @param movieIdInteger the internet Id of the particular movie the user focused on
+     * @param clickedPosition the position of the particular movie in the ArrayList<Movie>
      */
     @Override
     public void onListItemClick(int clickedPosition) {
-        //Casting the id into a string and building the query uri
-//        String movieIdString = Long.toString(movieIdInteger);
+
         Movie currentMovie = mMovieList.get(clickedPosition);
 //        Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
 //                .appendPath(movieIdString)

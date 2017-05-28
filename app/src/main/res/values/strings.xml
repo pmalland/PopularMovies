@@ -38,6 +38,7 @@
     <string name="toast_no_sort_needed">Already sorted that way</string>
     <string name="toast_empty_cursor">Unexpected empty cursor</string>
     <string name="toast_querying_for_a_movie">Looking for a movie</string>
+    <string name="toast_marked_as_favorite">Marked as favorite</string>
 
     <!-- - - - - - - - - - - - - -
       - Used in NetworkUtils  -
@@ -63,4 +64,9 @@
     <string name="pref_poster_resolution_key" translatable="false">poster</string>
     <string name="pref_poster_resolution_default">w342</string>
 
+    <!-- - - - - - - - - - - - - - - -
+      - Used in MovieDetails  -
+      - - - - - - - - - - - - - - - -->
+
+    <string name="favorite_button" translatable="true">Mark as favorite</string>
 </resources>

@@ -203,7 +203,14 @@ public class MovieProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri:" + uri);
             }
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        /**
+         * Turns out that when keep the getContentResolver().notifyChange() it forces the
+         * main activity to reload the adapter with favorite data regardless of the preferences.
+         * It could be a desired behaviour but I decided to skip it so user is not forced to see
+         * the favorites panel each time he marks a move
+         */
+//        getContext().getContentResolver().notifyChange(uri,null);
+
         return returnUri;
 
     }

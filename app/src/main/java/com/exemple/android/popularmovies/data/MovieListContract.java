@@ -43,6 +43,16 @@ public class MovieListContract {
 
         public static final Uri buildMovieUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI,id);
+
+            /**
+             * Or it could be without the ContentUris class. Can't decide if it's better
+             * or not.
+             */
+//            String movieIdString = Long.toString(id);
+//            Uri detailUri = MovieListContract.MovieListEntry.CONTENT_URI.buildUpon()
+//                    .appendPath(movieIdString)
+//                    .build();
+
         }
     }
 

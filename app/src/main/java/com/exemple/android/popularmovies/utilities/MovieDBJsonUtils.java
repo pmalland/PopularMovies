@@ -2,7 +2,6 @@ package com.exemple.android.popularmovies.utilities;
 
 
 import android.content.ContentValues;
-import android.util.Log;
 
 import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieListContract;
@@ -109,8 +108,6 @@ public class MovieDBJsonUtils {
             originalTitle = movie.getString(MDB_ORIGINAL_TITLE);
             voteAverage = movie.getDouble(MDB_VOTE_AVERAGE);
             movieId = movie.getInt(MDB_MOVIE_ID);
-
-            Log.i("MovieDBJsonUils ", originalTitle);
 
             Movie movieData = new Movie();
             movieData.setPosterPath(posterPath);
