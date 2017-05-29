@@ -4,7 +4,10 @@ package com.exemple.android.popularmovies.utilities;
 import android.content.ContentValues;
 
 import com.exemple.android.popularmovies.data.Movie;
+import com.exemple.android.popularmovies.data.MovieDetails;
 import com.exemple.android.popularmovies.data.MovieListContract;
+import com.exemple.android.popularmovies.data.Review;
+import com.exemple.android.popularmovies.data.Video;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +19,10 @@ public class MovieDBJsonUtils {
 
     private static final String MDB_RESULTS = "results";
 
+    /********************************
+     ** USED IN MAIN ACTIVITY JSON **
+     ********************************/
+
     private static final String MDB_POSTER_PATH = "poster_path";
     private static final String MDB_OVERVIEW = "overview";
     private static final String MDB_RELEASE_DATE = "release_date";
@@ -23,6 +30,19 @@ public class MovieDBJsonUtils {
     private static final String MDB_ORIGINAL_TITLE = "original_title";
     private static final String MDB_VOTE_AVERAGE = "vote_average";
 
+    /**********************************
+     ** USED IN DETAIL ACTIVITY JSON **
+     **********************************/
+
+    private static final String MDB_REVIEWS ="reviews";
+    private static final String MDB_REVIEW_ID ="id";
+    private static final String MDB_AUTHOR ="author";
+    private static final String MDB_CONTENT ="content";
+
+    private static final String MDB_VIDEOS ="videos";
+    private static final String MDB_KEY ="key";
+    private static final String MDB_NAME ="name";
+    private static final String MDB_SITE ="site";
 
     /**
      * Parsing the raw HTTP result into a JSON, we can then access the movies data
@@ -121,5 +141,59 @@ public class MovieDBJsonUtils {
         }
         return movieDBMovieList;
 
+    }
+
+    public static MovieDetails getMovieDetailsFromDetailJson(String movieDetailsJsonStr)
+            throws JSONException {
+        JSONObject movieDetailsJson = new JSONObject(movieDetailsJsonStr);
+        JSONObject reviewsJson = movieDetailsJson.getJSONObject(MDB_REVIEWS);
+        JSONArray reviewsArray = reviewsJson.getJSONArray(MDB_RESULTS);
+
+        ArrayList<Review> reviewArrayList = new ArrayList<>();
+
+        for (int i = 0; i < reviewsArray.length(); i++){
+
+            String id;
+            String author;
+            String content;
+
+            /*Get the JSON object representing the review */
+
+            JSONObject review = reviewsArray.getJSONObject(i);
+
+            id = review.getString(MDB_REVIEW_ID);
+            author = review.getString(MDB_AUTHOR);
+            content = review.getString(MDB_CONTENT);
+
+            Review reviewData = new Review();
+            reviewData.setId(id);
+            reviewData.setAuthor(author);
+            reviewData.setContent(content);
+
+            reviewArrayList.add(reviewData);
+        }
+
+        JSONObject videosJson = movieDetailsJson.getJSONObject(MDB_VIDEOS);
+        JSONArray videoArray = videosJson.getJSONArray(MDB_RESULTS);
+
+        String key;
+        String name;
+        String site;
+
+        JSONObject firstTrailerInArray = videoArray.getJSONObject(0);
+        key = firstTrailerInArray.getString(MDB_KEY);
+        name = firstTrailerInArray.getString(MDB_NAME);;
+        site = firstTrailerInArray.getString(MDB_SITE);
+
+        Video video = new Video();
+        video.setKey(key);
+        video.setName(name);
+        video.setSite(site);
+
+        MovieDetails movieDetails = new MovieDetails();
+        movieDetails.setVideo(video);
+        movieDetails.setReviews(reviewArrayList);
+
+        return movieDetails;
     }
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.exemple.android.popularmovies.data.Movie;
+import com.exemple.android.popularmovies.data.MovieDetails;
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
 import com.exemple.android.popularmovies.utilities.MovieUtils;
@@ -73,6 +75,7 @@ public class DetailActivity extends AppCompatActivity
     private Uri mMovieDetailUri;
     private Movie mMovie;
     private Toast mToast;
+    private MovieDetails mMovieDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,5 +209,32 @@ public class DetailActivity extends AppCompatActivity
             }
 
         });
+    }
+
+    public class FetchMovieDetailsTask extends AsyncTask<URL,Void, MovieDetails>{
+
+
+        @Override
+        protected MovieDetails doInBackground(URL... params) {
+
+            URL searchURL = params[0];
+            String jsonMovieDbDetailsResult;
+            try{
+                jsonMovieDbDetailsResult = NetworkUtils.getResponseFromHttpUrl(searchURL);
+
+            } catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(MovieDetails movieDetails) {
+            super.onPostExecute(movieDetails);
+        }
     }
 }

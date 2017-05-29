@@ -3,12 +3,12 @@ package com.exemple.android.popularmovies.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MovieDetails implements Parcelable{
 
     public Movie movie;
-    public List<Review> reviews =  null;
+    public ArrayList<Review> reviews;
     public Video video;
 
     /**
@@ -36,7 +36,7 @@ public class MovieDetails implements Parcelable{
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeValue(this.movie);
-        parcel.writeList(this.reviews);
+        parcel.writeTypedList(this.reviews);
         parcel.writeValue(this.video);
     }
 
@@ -48,7 +48,8 @@ public class MovieDetails implements Parcelable{
      */
     protected MovieDetails(Parcel in){
         this.movie = (Movie) in.readValue(Movie.class.getClassLoader());
-        in.readList(this.reviews, Review.class.getClassLoader());
+        this.reviews = new ArrayList<Review>();
+        in.readTypedList(this.reviews, Review.CREATOR);
         this.video = (Video) in.readValue(Video.class.getClassLoader());
     }
 
@@ -93,11 +94,11 @@ public class MovieDetails implements Parcelable{
         this.movie = movie;
     }
 
-    public List<Review> getReviews() {
+    public ArrayList<Review> getReviews() {
         return reviews;
     }
 
-    public void setReviews(List<Review> reviews) {
+    public void setReviews(ArrayList<Review> reviews) {
         this.reviews = reviews;
     }
 
