@@ -1,6 +1,9 @@
 package com.exemple.android.popularmovies.utilities;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 
 import java.io.IOException;
@@ -123,6 +126,21 @@ public class NetworkUtils {
        }
 
    }
+
+    /**
+     *
+     * Checking for internet connection using the connectivity manager.
+     * This is were the permission "ACCESS_NETWORK_STATE" is needed
+     *
+     * @param context we need context to access SystemService
+     * @return true if a connection is up or pending
+     */
+    public static boolean isOnline(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 }
 
 

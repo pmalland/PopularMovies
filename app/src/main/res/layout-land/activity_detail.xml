@@ -33,6 +33,32 @@
             android:layout_height="0dp"
             android:layout_weight="3"/>
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_review"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:clipToPadding="true"
+            android:scrollbars="vertical"
+            android:background="#CCCC"/>
+
+        <TextView
+            android:id="@+id/error_message_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:padding="16dp"
+            android:visibility="invisible"
+            android:text="@string/error_message"/>
+
+        <!--A progress bar appears when the reviews data are still loading-->
+        <ProgressBar
+            android:id="@+id/loading_indicator_pb"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
+
 
     </LinearLayout>
 </ScrollView>

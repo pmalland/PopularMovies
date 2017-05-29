@@ -1,7 +1,6 @@
 package com.exemple.android.popularmovies;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,8 +29,6 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
 
     /*reference to a list item click listener*/
     private final ListItemClickListener mOnClickListener;
-
-    private Cursor mCursor;
 
     private List<Movie> mMovieList;
 
@@ -98,23 +95,9 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     }
 
     /**
-     * Change the content of the cursor.
-     *
-     * @param newCursor the new cursor to use as ForecastAdapter's data source
-     * @param posterSize the argument used to choose the poster resolution
-     *                   we get with the Picasso methods
-     */
-
-    void swapCursor(Cursor newCursor, String posterSize){
-        mCursor = newCursor;
-        mPosterSize = posterSize;
-        notifyDataSetChanged();
-    }
-
-    /**
      * Change the content of the movie list
      *
-     * @param newMovieList the new movie list to use as ForecastAdapter's data source
+     * @param newMovieList the new movie list to use as MovieAdapter's data source
      * @param posterSize the argument used to choose the poster resolution
      *                   we get with the Picasso methods
      */
@@ -125,7 +108,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHol
     }
     /**
      * The view holder. Behave as a cache of the child view for the movies poster.
-     * We also set ab OnClickListener here.
+     * We also set an OnClickListener here.
      */
     class MovieAdapterViewHolder extends RecyclerView.ViewHolder
                 implements View.OnClickListener {

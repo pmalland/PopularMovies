@@ -28,9 +28,6 @@
         android:visibility="invisible"
         android:text="@string/error_message"/>
 
-
-
-
     <!--A progress bar appears when the movies data is still loading-->
     <ProgressBar
         android:id="@+id/loading_indicator_pb"

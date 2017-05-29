@@ -4,8 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -122,8 +120,8 @@ public class MainActivity extends AppCompatActivity
         if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_list_key))){
             mMovieList = new ArrayList<Movie>();
             /*Checking for internet status*/
-            if(isOnline()) {
-         /*Filling the database asynchronously, using MoviePreferences.getPreferredSortingCriterion
+            if(NetworkUtils.isOnline(this)) {
+         /*Filling the movie list asynchronously, using MoviePreferences.getPreferredSortingCriterion
          to get the actual criterion saved in the preferences*/
                 loadMovieData(getPreferredSortingCriterion(this));
             } else {
@@ -137,9 +135,6 @@ public class MainActivity extends AppCompatActivity
             showDataView();
         }
 
-        // Initialize a loader or re use the already started one if it exists
-        /* Connect the activity whit le Loader life cycle  */
-//        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
     }
 
     @Override
@@ -493,18 +488,6 @@ public class MainActivity extends AppCompatActivity
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Checking for internet connection using the connectivity manager.
-     * This is were the permission "ACCESS_NETWORK_STATE" is needed
-     *
-     * @return true if a connection is up or pending
-     */
-    public boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
 
     /**
      * Adding an ItemTouchHelper to manage the swipe action. We make sure that it works only

@@ -2,17 +2,16 @@ package com.exemple.android.popularmovies;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +19,7 @@ import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieDetails;
 import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.MoviePreferences;
+import com.exemple.android.popularmovies.utilities.MovieDBJsonUtils;
 import com.exemple.android.popularmovies.utilities.MovieUtils;
 import com.exemple.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -29,8 +29,7 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DetailActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>{
+public class DetailActivity extends AppCompatActivity {
 
 
     /************************
@@ -44,6 +43,10 @@ public class DetailActivity extends AppCompatActivity
     @BindView(R.id.movie_rate_tv) TextView mRateTextView;
     @BindView(R.id.overview_tv) TextView mOverviewTextView;
     @BindView(R.id.bt_favorite) Button mFavoriteButton;
+
+    @BindView(R.id.error_message_tv) TextView mErrorMessageTextView;
+    @BindView(R.id.loading_indicator_pb)
+    ProgressBar mLoadingIndicator;
 
     /************************
      ** DETAILS LOADER ID **
@@ -77,6 +80,10 @@ public class DetailActivity extends AppCompatActivity
     private Toast mToast;
     private MovieDetails mMovieDetails;
 
+    private ReviewAdapter mReviewAdapter;
+
+    private RecyclerView mReviewListRecyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /* We retrieve a Movie from the Intent and look for
@@ -84,21 +91,47 @@ public class DetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        mReviewListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_review);
+
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        mReviewListRecyclerView.setLayoutManager(layoutManager);
+
+        mReviewAdapter = new ReviewAdapter(this);
+        mReviewListRecyclerView.setAdapter(mReviewAdapter);
+
         ButterKnife.bind(this);
 
-        /*Retrieving the needed Movie to get the data we want to display*/
-        Intent triggeringIntent = getIntent();
-        if (triggeringIntent != null) {
+        showloadingIndicator();
 
-            try {
-                mMovie = triggeringIntent.getExtras().getParcelable(getString(R.string.parcelable_movie_key));
-            } catch (NullPointerException e){
-                e.printStackTrace();
+        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_details_key))) {
+        /*Retrieving the needed Movie to get the data we want to display*/
+            Intent triggeringIntent = getIntent();
+            if (triggeringIntent != null) {
+
+                try {
+                    mMovie = triggeringIntent.getExtras()
+                            .getParcelable(getString(R.string.parcelable_movie_key));
+                    mMovieDetails.setMovie(mMovie);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+
             }
+            if (mMovie == null) throw new NullPointerException("Failed to pass Movie via Intent");
+            if (NetworkUtils.isOnline(this)){
+                loadReviewData();
+            }else {
+                showErrorMessage();
+            }
+        }else {
+            mMovieDetails = savedInstanceState
+                    .getParcelable(getString(R.string.parcelable_movie_key));
+            mMovie = mMovieDetails.getMovie();
+            mReviewAdapter.swapMovieList(mMovieDetails.getReviews());
+
 
         }
-        if(mMovie == null) throw new NullPointerException("Failed to pass Movie via Intent");
-
         /* Binding party*/
         mOriginalTitleTextView.setText(mMovie.getOriginalTitle());
         bind(mMovie.getPosterPath());
@@ -107,68 +140,33 @@ public class DetailActivity extends AppCompatActivity
         mRateTextView.setText(rate);
         mOverviewTextView.setText(mMovie.getOverview());
 
+        showDataView();
+
         addButtonClickListener();
 
-        /* Connect the activity whit le Loader life cycle  */
-//        getSupportLoaderManager().initLoader(ID_DETAIL_LOADER,null,this);
-    }
-
-    /**
-     * Cursor Loader called  when a new Loader needs to be created to fetch data from de data base
-     *
-     * @param loaderId The loader ID for which we need to create a loader
-     * @param args Any arguments supplied by the caller
-     * @return A new Loader instance that is ready to start loading.
-     */
-    @Override
-    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-
-        switch (loaderId){
-            case ID_DETAIL_LOADER:
-
-                        return new CursorLoader(this,
-                                mMovieDetailUri,
-                                DETAIL_MOVIE_PROJECTION,
-                                null,
-                                null,
-                                null);
-            default:
-                    throw new RuntimeException("Loader unknown :" + loaderId);
-        }
-    }
-
-    /**
-     * Called  on the main trade when a Loader has finished loading data.
-     *
-     * @param loader The Cursor loader that finished
-     * @param cursor The Cursor that is being returned
-     */
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-
-        /* Checking if the cursor has valid data, return if it is nor the case*/
-        boolean cursorHasValidDate = false;
-        if (cursor != null && cursor.moveToFirst()){
-            cursorHasValidDate = true;
-        }
-        if(!cursorHasValidDate){
-            String message = getString(R.string.toast_empty_cursor);
-            Toast.makeText(DetailActivity.this, message, Toast.LENGTH_LONG).show();
-            return;
-        }
-        /* Binding party*/
-        mOriginalTitleTextView.setText(cursor.getString(INDEX_MOVIE_ORIGINAL_TITLE));
-        bind(cursor.getString(INDEX_MOVIE_POSTER));
-        mReleaseDateTextView.setText(cursor.getString(INDEX_MOVIE_RELEASE_DATE));
-        String rate = Double.toString(cursor.getDouble(INDEX_MOVIE_VOTE_AVERAGE)) + "/10";
-        mRateTextView.setText(rate);
-        mOverviewTextView.setText(cursor.getString(INDEX_MOVIE_OVERVIEW));
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    private void loadReviewData(){
 
     }
+
+    private void showErrorMessage(){
+
+    }
+
+    private void showDataView(){
+
+    }
+
+    private void showloadingIndicator(){
+
+    }
+
 
     /**
      * Binds the image to her image view using the Picasso library.
@@ -222,18 +220,21 @@ public class DetailActivity extends AppCompatActivity
             try{
                 jsonMovieDbDetailsResult = NetworkUtils.getResponseFromHttpUrl(searchURL);
 
+                return MovieDBJsonUtils.getMovieDetailsFromDetailJson(jsonMovieDbDetailsResult);
             } catch (Exception e){
                 e.printStackTrace();
                 return null;
             }
 
-
-            return null;
         }
 
 
         @Override
         protected void onPostExecute(MovieDetails movieDetails) {
+            if (movieDetails != null){
+                mMovieDetails = movieDetails;
+
+            }
             super.onPostExecute(movieDetails);
         }
     }

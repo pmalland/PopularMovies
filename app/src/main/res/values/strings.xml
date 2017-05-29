@@ -69,4 +69,5 @@
       - - - - - - - - - - - - - - - -->
 
     <string name="favorite_button" translatable="true">Mark as favorite</string>
+    <string name="movie_details_key" translatable="false">movieDetails</string>
 </resources>
