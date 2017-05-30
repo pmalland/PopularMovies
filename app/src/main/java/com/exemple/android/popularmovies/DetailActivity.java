@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -45,8 +46,11 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.bt_favorite) Button mFavoriteButton;
 
     @BindView(R.id.error_message_tv) TextView mErrorMessageTextView;
-    @BindView(R.id.loading_indicator_pb)
-    ProgressBar mLoadingIndicator;
+    @BindView(R.id.loading_indicator_pb) ProgressBar mLoadingIndicator;
+
+    @BindView(R.id.tv_available) TextView mAvailableTextView;
+    @BindView(R.id.tv_trailer_type) TextView mTrailerTypeTextView;
+    @BindView(R.id.bt_youtube) Button mYoutubeButton;
 
     /************************
      ** DETAILS LOADER ID **
@@ -75,7 +79,7 @@ public class DetailActivity extends AppCompatActivity {
     public static final int INDEX_MOVIE_VOTE_AVERAGE = 4;
 //    public static final int INDEX_MOVIE_MOVIE_ID = 5;
 
-    private Uri mMovieDetailUri;
+//    private Uri mMovieDetailUri;
     private Movie mMovie;
     private Toast mToast;
     private MovieDetails mMovieDetails;
@@ -102,9 +106,13 @@ public class DetailActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        showloadingIndicator();
+        showLoadingIndicator();
+
+        boolean online = NetworkUtils.isOnline(this);
 
         if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_details_key))) {
+            mMovieDetails = new MovieDetails();
+            Log.i("DetailsActi","savedInstanceState == null");
         /*Retrieving the needed Movie to get the data we want to display*/
             Intent triggeringIntent = getIntent();
             if (triggeringIntent != null) {
@@ -119,17 +127,23 @@ public class DetailActivity extends AppCompatActivity {
 
             }
             if (mMovie == null) throw new NullPointerException("Failed to pass Movie via Intent");
-            if (NetworkUtils.isOnline(this)){
-                loadReviewData();
+            if (online){
+                loadReviewData(Long.toString(mMovie.getMovieId()));
+                showDataView();
             }else {
                 showErrorMessage();
             }
         }else {
+            Log.i("DetailsActi","savedInstanceState != null");
             mMovieDetails = savedInstanceState
                     .getParcelable(getString(R.string.parcelable_movie_key));
             mMovie = mMovieDetails.getMovie();
             mReviewAdapter.swapMovieList(mMovieDetails.getReviews());
-
+            try {
+                if (mMovieDetails.getReviews() != null) showDataView();
+            }catch (NullPointerException e){
+                e.printStackTrace();
+            }
 
         }
         /* Binding party*/
@@ -139,32 +153,26 @@ public class DetailActivity extends AppCompatActivity {
         String rate = Double.toString(mMovie.getVoteAverage()) + "/10";
         mRateTextView.setText(rate);
         mOverviewTextView.setText(mMovie.getOverview());
+        try {
+            if (online) {
+                mTrailerTypeTextView.setText(mMovieDetails.getVideo().getName());
 
-        showDataView();
-
-        addButtonClickListener();
-
+                addButtonClickListener();
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(getString(R.string.parcelable_movie_key),mMovieDetails);
         super.onSaveInstanceState(outState);
     }
 
-    private void loadReviewData(){
-
-    }
-
-    private void showErrorMessage(){
-
-    }
-
-    private void showDataView(){
-
-    }
-
-    private void showloadingIndicator(){
-
+    private void loadReviewData(String movieID){
+        URL movieDetailsSearchURL = NetworkUtils.buildMovieDetailURL(movieID);
+        new FetchMovieDetailsTask().execute(movieDetailsSearchURL);
     }
 
 
@@ -207,6 +215,17 @@ public class DetailActivity extends AppCompatActivity {
             }
 
         });
+
+        mYoutubeButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                NetworkUtils.watchYoutubeVideo(mMovieDetails
+                                .getVideo()
+                                .getKey()
+                                , getApplicationContext());
+            }
+        });
     }
 
     public class FetchMovieDetailsTask extends AsyncTask<URL,Void, MovieDetails>{
@@ -238,4 +257,32 @@ public class DetailActivity extends AppCompatActivity {
             super.onPostExecute(movieDetails);
         }
     }
+
+    /**
+     * Showing an error message
+     */
+    private void showErrorMessage(){
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mReviewListRecyclerView.setVisibility(View.INVISIBLE);
+        mErrorMessageTextView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Showing the recycler view
+     */
+    private void showDataView(){
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mErrorMessageTextView.setVisibility(View.INVISIBLE);
+        mReviewListRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Show a loading indicator, hiding the data view
+     */
+    private void showLoadingIndicator(){
+        mErrorMessageTextView.setVisibility(View.INVISIBLE);
+        mReviewListRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
+
 }

@@ -105,6 +105,9 @@ public class MainActivity extends AppCompatActivity
 
         mMovieListRecyclerView.setLayoutManager(layoutManager);
         mMovieListRecyclerView.setHasFixedSize(true);
+//        mMovieListRecyclerView.setItemViewCacheSize(10);
+//        mMovieListRecyclerView.setDrawingCacheEnabled(true);
+//        mMovieListRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
         mMovieAdapter = new MovieAdapter(this, this);
 

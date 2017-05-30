@@ -45,11 +45,16 @@
             android:paddingEnd="@dimen/detail_overview_margin"
             android:paddingRight="@dimen/detail_overview_margin"/>
 
+        <include
+            android:id="@+id/trailer_view"
+            layout="@layout/trailer_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_review"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_height="wrap_content"
             android:clipToPadding="true"
             android:scrollbars="vertical"
             android:background="#CCCC"/>

@@ -1,10 +1,13 @@
 package com.exemple.android.popularmovies.utilities;
 
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
+
+import static android.content.ContentValues.TAG;
 
 public class NetworkUtils {
     /*Used in Log*/
@@ -34,9 +39,17 @@ public class NetworkUtils {
 
     private final static String POSTER_BASE_URL= "http://image.tmdb.org/t/p/";
 
+    /*Used for the Details Review and Trailer request*/
+    private final static String PARAM_MOVIE = "/movie";
+    private final static String DETAILS_QUERY_BASE_URL = THEMOVIEDB_BASE_URL + PARAM_MOVIE;
+    private final static String PARAM_APPEND_DETAILS_UPON = "&append_to_response=videos,reviews";
+    private final static String API_AND_TAIL = "?api_key="
+            + API_KEY_VALUE + PARAM_APPEND_DETAILS_UPON ;
+
     /**
      * Building the proper URL to query movies data.
-     *
+     * The URL looks like:
+     * http://api.themoviedb.org/3/movie/popular?api_key={your_api_key}
      * @param REQUEST_KEY indicate which one between order by popularity and order by rate
      *                    the user chose.
      * @return URL to query movies data
@@ -67,6 +80,10 @@ public class NetworkUtils {
 
     /**
      * Building the proper URL to query for a movie's poster
+     * THE url looks like:
+     * http://image.tmdb.org/t/p/{posterSize}/{posterPath}
+     * Note that posterPath already contains "/" and the two "/" are needed, reason to use
+     * appendEncodedPath instead of appendPath (who auto deal with the exit characters)
      *
      * @param posterPath final part of the path needed to build the URL, unique to
      *                   each movie
@@ -89,7 +106,30 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
-//        Log.v(TAG, "Built URI " + url);
+        return url;
+    }
+
+    /**  "?api_key=" + API_KEY_VALUE + PARAM_APPEND_DETAILS_UPON
+     * Building the proper URL to query a movie details.
+     * For memo, the URL looks like:
+     * http://api.themoviedb.org/3/movie/{movieId}?api_key={apiKey}&append_to_response=videos,reviews
+     * @param movieID the movie ID in the MovieDB database
+     * @return URL to query movie details
+     */
+    public static URL buildMovieDetailURL(String movieID){
+        String assembledQueryTail = movieID + API_AND_TAIL;
+        Uri ourBuiltUri = Uri.parse(DETAILS_QUERY_BASE_URL).buildUpon()
+                .appendEncodedPath(assembledQueryTail)
+                .build();
+        Log.i("buildMovieDetailURL", ourBuiltUri.toString());
+        URL url = null;
+        try{
+            url = new URL(ourBuiltUri.toString());
+        }catch (MalformedURLException e){
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
         return url;
     }
 
@@ -140,6 +180,17 @@ public class NetworkUtils {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public static void watchYoutubeVideo(String id, Context context){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            context.startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            context.startActivity(webIntent);
+        }
     }
 }
 

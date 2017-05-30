@@ -2,6 +2,7 @@ package com.exemple.android.popularmovies.utilities;
 
 
 import android.content.ContentValues;
+import android.util.Log;
 
 import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieDetails;
@@ -168,6 +169,7 @@ public class MovieDBJsonUtils {
             Review reviewData = new Review();
             reviewData.setId(id);
             reviewData.setAuthor(author);
+            Log.i("JsonUtilReview", reviewData.getAuthor());
             reviewData.setContent(content);
 
             reviewArrayList.add(reviewData);
@@ -188,6 +190,7 @@ public class MovieDBJsonUtils {
         Video video = new Video();
         video.setKey(key);
         video.setName(name);
+        Log.i("JsonUtilVideo", video.getName());
         video.setSite(site);
 
         MovieDetails movieDetails = new MovieDetails();
