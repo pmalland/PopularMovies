@@ -528,6 +528,8 @@ public class MainActivity extends AppCompatActivity
                     getContentResolver().delete(deleteQueryUri, null, null);
 
                     getSupportLoaderManager().restartLoader(ID_MOVIE_LOADER, null, MainActivity.this);
+                } else {
+                    mMovieAdapter.notifyDataSetChanged();
                 }
             }
         }

@@ -69,7 +69,7 @@
       - - - - - - - - - - - - - - - -->
 
     <string name="favorite_button" translatable="true">Mark as favorite</string>
-    <string name="avaible_trailer">Available:</string>
-    <string name="youtube_button" translatable="true">Go to Youtube</string>
+    <string name="avaible_trailer">Found:</string>
+    <string name="youtube_button" translatable="true">Watch on Youtube</string>
     <string name="movie_details_key" translatable="false">movieDetails</string>
 </resources>

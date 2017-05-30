@@ -1,6 +1,8 @@
 package com.exemple.android.popularmovies;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -146,7 +148,8 @@ public class DetailActivity extends AppCompatActivity {
             }
 
         }
-        /* Binding party*/
+        bindingParty();
+       /* *//* Binding party*//*
         mOriginalTitleTextView.setText(mMovie.getOriginalTitle());
         bind(mMovie.getPosterPath());
         mReleaseDateTextView.setText(mMovie.getReleaseDate());
@@ -155,6 +158,24 @@ public class DetailActivity extends AppCompatActivity {
         mOverviewTextView.setText(mMovie.getOverview());
         try {
             if (online) {
+                mTrailerTypeTextView.setText(mMovieDetails.getVideo().getName());
+
+                addButtonClickListener();
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }*/
+    }
+
+    private void bindingParty(){
+        mOriginalTitleTextView.setText(mMovie.getOriginalTitle());
+        bind(mMovie.getPosterPath());
+        mReleaseDateTextView.setText(mMovie.getReleaseDate());
+        String rate = Double.toString(mMovie.getVoteAverage()) + "/10";
+        mRateTextView.setText(rate);
+        mOverviewTextView.setText(mMovie.getOverview());
+        try {
+            if (NetworkUtils.isOnline(this)) {
                 mTrailerTypeTextView.setText(mMovieDetails.getVideo().getName());
 
                 addButtonClickListener();
@@ -220,10 +241,11 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                NetworkUtils.watchYoutubeVideo(mMovieDetails
+                watchYoutubeVideo(mMovieDetails
                                 .getVideo()
                                 .getKey()
                                 , getApplicationContext());
+
             }
         });
     }
@@ -251,7 +273,10 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(MovieDetails movieDetails) {
             if (movieDetails != null){
+                Log.i("OnPostExecute", "movieDetails != null");
                 mMovieDetails = movieDetails;
+                mReviewAdapter.swapMovieList(mMovieDetails.getReviews());
+                bindingParty();
 
             }
             super.onPostExecute(movieDetails);
@@ -285,4 +310,15 @@ public class DetailActivity extends AppCompatActivity {
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
+    private void watchYoutubeVideo(String id, Context context){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            context.startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            context.startActivity(webIntent);
+        }
+    }
 }
+
