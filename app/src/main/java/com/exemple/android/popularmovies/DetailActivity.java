@@ -85,6 +85,7 @@ public class DetailActivity extends AppCompatActivity {
     private Movie mMovie;
     private Toast mToast;
     private MovieDetails mMovieDetails;
+    private Context mContext;
 
     private ReviewAdapter mReviewAdapter;
 
@@ -92,11 +93,12 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        Activity activity = (Activity) getApplicationContext();
         /* We retrieve a Movie from the Intent and look for
          for the details of the selected movie and display it       */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
+        mContext = this;
         mReviewListRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_review);
 
         LinearLayoutManager layoutManager =
@@ -244,7 +246,7 @@ public class DetailActivity extends AppCompatActivity {
                 watchYoutubeVideo(mMovieDetails
                                 .getVideo()
                                 .getKey()
-                                , getApplicationContext());
+                                , mContext);
 
             }
         });
