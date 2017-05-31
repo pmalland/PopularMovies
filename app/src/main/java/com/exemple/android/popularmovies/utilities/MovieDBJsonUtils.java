@@ -1,12 +1,10 @@
 package com.exemple.android.popularmovies.utilities;
 
 
-import android.content.ContentValues;
 import android.util.Log;
 
 import com.exemple.android.popularmovies.data.Movie;
 import com.exemple.android.popularmovies.data.MovieDetails;
-import com.exemple.android.popularmovies.data.MovieListContract;
 import com.exemple.android.popularmovies.data.Review;
 import com.exemple.android.popularmovies.data.Video;
 
@@ -44,55 +42,6 @@ public class MovieDBJsonUtils {
     private static final String MDB_KEY ="key";
     private static final String MDB_NAME ="name";
     private static final String MDB_SITE ="site";
-
-    /**
-     * Parsing the raw HTTP result into a JSON, we can then access the movies data
-     * and store them in a convenient ContentValues []
-     *
-     * @param movieDBJsonStr raw response from the server in a string
-     * @return the structured data in a ContentValues
-     * @throws JSONException If JSON data cannot be properly parsed
-     */
-    public static ContentValues[] getMovieContentValuesFromJson(String movieDBJsonStr)
-        throws JSONException {
-
-        JSONObject movieDBJson = new JSONObject(movieDBJsonStr);
-
-        JSONArray jsonMovieArray = movieDBJson.getJSONArray(MDB_RESULTS);
-
-        ContentValues[] movieDBContentValues = new ContentValues[jsonMovieArray.length()];
-
-        for (int i = 0; i < jsonMovieArray.length(); i++) {
-
-            String posterPath;
-            String overview;
-            String release_date;
-            String originalTitle;
-            double voteAverage;
-            int movieId;
-
-            /*Get the JSON object representing the movie */
-            JSONObject movie = jsonMovieArray.getJSONObject(i);
-
-            posterPath = movie.getString(MDB_POSTER_PATH);
-            overview = movie.getString(MDB_OVERVIEW);
-            release_date = movie.getString(MDB_RELEASE_DATE);
-            originalTitle = movie.getString(MDB_ORIGINAL_TITLE);
-            voteAverage = movie.getDouble(MDB_VOTE_AVERAGE);
-            movieId = movie.getInt(MDB_MOVIE_ID);
-
-            ContentValues movieValues = new ContentValues();
-            movieValues.put(MovieListContract.MovieListEntry.COLUMN_POSTER_PATH,posterPath);
-            movieValues.put(MovieListContract.MovieListEntry.COLUMN_OVERVIEW,overview);
-            movieValues.put(MovieListContract.MovieListEntry.COLUMN_RELEASE_DATE,release_date);
-            movieValues.put(MovieListContract.MovieListEntry.COLUMN_ORIGINAL_TITLE,originalTitle);
-            movieValues.put(MovieListContract.MovieListEntry.COLUMN_VOTE_AVERAGE,voteAverage);
-            movieValues.put(MovieListContract.MovieListEntry.COLUMN_MOVIE_ID,movieId);
-
-            movieDBContentValues[i] = movieValues;
-        }
-    return movieDBContentValues;
-    }
 
     /**
      * Parsing the raw HTTP result into a JSON, we can then access the movies data
@@ -144,6 +93,14 @@ public class MovieDBJsonUtils {
 
     }
 
+    /**The Json will contain details ,reviews and trailers.
+     * Parsing the raw HTTP result into a JSON, we can then access the movies data
+     * and store them in a convenient MovieDetails
+     *
+     * @param movieDetailsJsonStr raw response from the server in a string
+     * @return the structured data in a MovieDetails
+     * @throws JSONException If JSON data cannot be properly parsed
+     */
     public static MovieDetails getMovieDetailsFromDetailJson(String movieDetailsJsonStr)
             throws JSONException {
         JSONObject movieDetailsJson = new JSONObject(movieDetailsJsonStr);

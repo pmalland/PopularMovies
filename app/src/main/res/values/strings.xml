@@ -77,7 +77,7 @@
       - - - - - - - - - - - - - - - -->
 
     <string name="favorite_button" translatable="true">Mark as favorite</string>
-    <string name="share_button" translatable="true">Share First Trailer</string>
+    <string name="share_button" translatable="true">Share Trailer</string>
     <string name="available_trailer">Click to play:</string>
     <string name="youtube_button" translatable="true">Watch on Youtube</string>
     <string name="movie_details_key" translatable="false">movieDetails</string>

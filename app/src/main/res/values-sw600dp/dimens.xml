@@ -10,6 +10,7 @@
 
     <dimen name="detail_overview_margin">32dp</dimen>
 
+    <dimen name="inter_button_margin">12dp</dimen>
 
     <!-- - - - - - - - -
       - Text sizes  -

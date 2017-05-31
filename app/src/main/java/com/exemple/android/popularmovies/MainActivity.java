@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
         showLoadingIndicator();
 
         if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.movie_list_key))){
-            mMovieList = new ArrayList<Movie>();
+            mMovieList = new ArrayList<>();
             /*Checking for internet status*/
             if(NetworkUtils.isOnline(this)) {
          /*Filling the movie list asynchronously, using MoviePreferences.getPreferredSortingCriterion
@@ -161,9 +161,6 @@ public class MainActivity extends AppCompatActivity
         /* Connect the activity whit le Loader life cycle  */
             getSupportLoaderManager().initLoader(ID_MOVIE_LOADER,null,MainActivity.this);
         }
-
-
-
 
     }
 
@@ -239,7 +236,6 @@ public class MainActivity extends AppCompatActivity
            showDataView();
        } else Log.i("onLoadFinished", "data.getCount() = 0");
 
-
     }
 
     /**
@@ -250,7 +246,7 @@ public class MainActivity extends AppCompatActivity
     public void onLoaderReset(Loader<Cursor> loader) {
 //        String posterResolution = MoviePreferences.getPreferredPosterResolution(MainActivity.this);
 //        mMovieAdapter.swapMovieList(null, posterResolution);
-        Log.i("onLoadReset", "called");
+//        Log.i("onLoadReset", "called");
     }
 
     /**

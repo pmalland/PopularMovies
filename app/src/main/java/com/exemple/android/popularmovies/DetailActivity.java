@@ -1,7 +1,6 @@
 package com.exemple.android.popularmovies;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -348,15 +347,5 @@ public class DetailActivity extends AppCompatActivity
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
-    private void watchYoutubeVideo(String id, Context context){
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
-        Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://www.youtube.com/watch?v=" + id));
-        try {
-            context.startActivity(appIntent);
-        } catch (ActivityNotFoundException ex) {
-            context.startActivity(webIntent);
-        }
-    }
 }
 

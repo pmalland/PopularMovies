@@ -48,7 +48,7 @@ public class MovieDetails implements Parcelable{
      */
     protected MovieDetails(Parcel in){
         this.movie = (Movie) in.readValue(Movie.class.getClassLoader());
-        this.reviews = new ArrayList<Review>();
+        this.reviews = new ArrayList<>();
         in.readTypedList(this.reviews, Review.CREATOR);
         in.readTypedList(this.videos, Video.CREATOR);
     }
