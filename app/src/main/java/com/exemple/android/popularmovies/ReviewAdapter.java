@@ -100,7 +100,7 @@ class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterView
 
         /*Binding the review data to the corresponding TextView*/
         void bind(String reviewAuthor, String reviewContent){
-            listReviewAuthorTextView.setText(reviewAuthor);
+            listReviewAuthorTextView.setText(reviewAuthor + " wrote:");
             listReviewContentTextView.setText(reviewContent);
         }
     }

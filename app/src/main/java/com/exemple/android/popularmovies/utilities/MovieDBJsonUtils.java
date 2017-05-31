@@ -178,23 +178,30 @@ public class MovieDBJsonUtils {
         JSONObject videosJson = movieDetailsJson.getJSONObject(MDB_VIDEOS);
         JSONArray videoArray = videosJson.getJSONArray(MDB_RESULTS);
 
-        String key;
-        String name;
-        String site;
+        ArrayList<Video> videoArrayList = new ArrayList<>();
+        for (int j = 0; j < videoArray.length(); j++){
 
-        JSONObject firstTrailerInArray = videoArray.getJSONObject(0);
-        key = firstTrailerInArray.getString(MDB_KEY);
-        name = firstTrailerInArray.getString(MDB_NAME);;
-        site = firstTrailerInArray.getString(MDB_SITE);
+            String key;
+            String name;
+            String site;
 
-        Video video = new Video();
-        video.setKey(key);
-        video.setName(name);
-        Log.i("JsonUtilVideo", video.getName());
-        video.setSite(site);
+            JSONObject firstTrailerInArray = videoArray.getJSONObject(j);
+            key = firstTrailerInArray.getString(MDB_KEY);
+            name = firstTrailerInArray.getString(MDB_NAME);;
+            site = firstTrailerInArray.getString(MDB_SITE);
+
+            Video video = new Video();
+            video.setKey(key);
+            video.setName(name);
+            Log.i("JsonUtilVideo", video.getName());
+            video.setSite(site);
+
+            videoArrayList.add(video);
+        }
+
 
         MovieDetails movieDetails = new MovieDetails();
-        movieDetails.setVideo(video);
+        movieDetails.setVideos(videoArrayList);
         movieDetails.setReviews(reviewArrayList);
 
         return movieDetails;

@@ -9,7 +9,7 @@ public class MovieDetails implements Parcelable{
 
     public Movie movie;
     public ArrayList<Review> reviews;
-    public Video video;
+    public ArrayList<Video> videos;
 
     /**
      * Public constructor
@@ -37,7 +37,7 @@ public class MovieDetails implements Parcelable{
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeValue(this.movie);
         parcel.writeTypedList(this.reviews);
-        parcel.writeValue(this.video);
+        parcel.writeTypedList(this.videos);
     }
 
     /**
@@ -50,7 +50,7 @@ public class MovieDetails implements Parcelable{
         this.movie = (Movie) in.readValue(Movie.class.getClassLoader());
         this.reviews = new ArrayList<Review>();
         in.readTypedList(this.reviews, Review.CREATOR);
-        this.video = (Video) in.readValue(Video.class.getClassLoader());
+        in.readTypedList(this.videos, Video.CREATOR);
     }
 
     /**
@@ -102,11 +102,11 @@ public class MovieDetails implements Parcelable{
         this.reviews = reviews;
     }
 
-    public Video getVideo() {
-        return video;
+    public ArrayList<Video> getVideos() {
+        return videos;
     }
 
-    public void setVideo(Video video) {
-        this.video = video;
+    public void setVideos(ArrayList<Video> videos) {
+        this.videos = videos;
     }
 }

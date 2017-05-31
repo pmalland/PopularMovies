@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:background="@color/teal300"
-        android:textSize="@dimen/text_headline"
+        android:textSize="@dimen/text_subhead"
         android:textColor="@color/primary_text"
         android:textStyle="bold"
         android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -25,11 +25,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:background="@color/teal300"
-        android:textSize="@dimen/text_subhead"
+        android:textSize="@dimen/text_body2"
         android:textColor="@color/primary_text"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 
 </LinearLayout>

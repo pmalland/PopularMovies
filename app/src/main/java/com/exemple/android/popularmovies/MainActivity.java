@@ -1,6 +1,5 @@
 package com.exemple.android.popularmovies;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -255,69 +254,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * The asynchronous task that gets our data from internet
+     * The asynchronous task that gets our data from internet.
+     * Take the URL localizing the data we need and return an ArrayList<Movie>
      */
-
-    public class FetchMovieTask extends AsyncTask<URL,Void,ContentValues[]>{
-        /**
-         * Flushing the existing data base
-         */
-        @Override
-        protected void onPreExecute() {
-//            MainActivity.this.getContentResolver()
-//              .delete(MovieListContract.MovieListEntry.CONTENT_URI,null,null);
-            super.onPreExecute();
-
-        }
-
-        /**
-         * Fetching a JSON containing the data from the internet using NetworkUtils and then
-         * factoring it into a ContentValues[]
-         *
-         * @param params containing the URL to perform the search on internet
-         * @return dataFromJson the ContentValues[] containing the movies data
-         */
-        @Override
-        protected ContentValues[] doInBackground(URL... params) {
-            URL searchURL = params[0];
-            String jsonMovieDBResults;
-            try {
-                jsonMovieDBResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
-           /*MovieDBJsonUtils.getMovieContentValuesFromJson returns a ContentValues[]
-                 whit all the data extracted from the Json*/
-                return MovieDBJsonUtils.getMovieContentValuesFromJson(jsonMovieDBResults);
-            } catch (Exception e){
-                e.printStackTrace();
-                return null;
-            }
-
-
-        }
-
-        /**
-         * Filling the database with movieData.
-         * Emptiness of movieData indicated a internet connection problem
-         * or an unusable JSON return from the internet query
-         * @param movieData the movies data
-         */
-        @Override
-        protected void onPostExecute(ContentValues[] movieData) {
-            if(movieData != null){
-                MainActivity.this.getContentResolver()
-                        .bulkInsert(MovieListContract.MovieListEntry.CONTENT_URI,movieData);
-
-
-
-
-            } else {
-                showErrorMessage();
-            }
-        }
-    }
-
     public class FetchMoviesTask extends AsyncTask<URL,Void,ArrayList<Movie>>{
         /**
-         * Flushing the existing data base
+         * Flushing the existing data base if any
          */
         @Override
         protected void onPreExecute() {
@@ -351,7 +293,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         /**
-         * Filling the database with movieData.
+         * Filling the dataset with movieData.
          * Emptiness of movieData indicated a internet connection problem
          * or an unusable JSON return from the internet query
          * @param movieData the movies data

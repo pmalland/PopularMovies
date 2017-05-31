@@ -8,6 +8,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="detail_overview_margin">12dp</dimen>
+    <dimen name="inter_button_margin">8dp</dimen>
 
     <!-- - - - - - - - -
       - Text sizes  -

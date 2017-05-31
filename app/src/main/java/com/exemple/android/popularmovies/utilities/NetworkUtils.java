@@ -46,6 +46,9 @@ public class NetworkUtils {
     private final static String API_AND_TAIL = "?api_key="
             + API_KEY_VALUE + PARAM_APPEND_DETAILS_UPON ;
 
+    private final static String YOUTUBE_PREFIX = "http://www.youtube.com/watch?v=";
+    private final static String YOUTUBE_APP_PREFIX = "vnd.youtube:";
+
     /**
      * Building the proper URL to query movies data.
      * The URL looks like:
@@ -182,15 +185,18 @@ public class NetworkUtils {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    public static void watchYoutubeVideo(String id, Context context){
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+    public static void watchYoutubeVideo(String key, Context context){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(YOUTUBE_APP_PREFIX + key));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://www.youtube.com/watch?v=" + id));
+                Uri.parse(YOUTUBE_PREFIX + key));
         try {
             context.startActivity(appIntent);
         } catch (ActivityNotFoundException ex) {
             context.startActivity(webIntent);
         }
+    }
+    public static String getYoutubeURL(String key){
+        return YOUTUBE_PREFIX + key;
     }
 }
 

@@ -61,4 +61,16 @@
         app:layout_constraintTop_toBottomOf="@+id/movie_rate_tv"
         app:layout_constraintLeft_toLeftOf="@+id/movie_rate_tv" />
 
+    <Button
+        android:id="@+id/bt_share_trailer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/favorite_button"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toTopOf="@+id/bt_favorite"
+        app:layout_constraintLeft_toRightOf="@+id/bt_favorite"
+        android:visibility="invisible"
+        android:layout_marginLeft="@dimen/inter_button_margin"/>
+
 </android.support.constraint.ConstraintLayout>

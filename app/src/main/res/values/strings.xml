@@ -14,9 +14,13 @@
 
     <string name="content_authority" translatable="false">com.exemple.android.popularmovies</string>
 
+    <!-- - - - - - - - - - -
+      - Used in Intents  -
+      - - - - - - - - - - -->
     <string name="movie_list_key" translatable="false">movieList</string>
     <string name="parcelable_movie_key" translatable="false">parcelable_movie</string>
-
+    <string name="shared_intent_title" translatable="true">Check out this awesome trailer !</string>
+    <string name="text_plain_mime_type" translatable="false">text/plain</string>
     <!-- - - - - - - - - - - - - - -
       - Used in the action bar  -
       - - - - - - - - - - - - - - -->
@@ -39,6 +43,9 @@
     <string name="toast_empty_cursor">Unexpected empty cursor</string>
     <string name="toast_querying_for_a_movie">Looking for a movie</string>
     <string name="toast_marked_as_favorite">Marked as favorite</string>
+    <string name="toast_waiting_youtube">Waiting for Youtube response</string>
+    <string name="toast_sharing_process">Sharing process</string>
+    <string name="toast_waiting_data">Waiting for data</string>
 
     <!-- - - - - - - - - - - - - -
       - Used in NetworkUtils  -
@@ -47,9 +54,10 @@
 
 
     <!-- - - - - - - - - - - -
-      - An error message  -
+      - Error messages  -
       - - - - - - - - - - - -->
     <string name="error_message">Please check your internet connection.</string>
+    <string name="failed_details_Intent">Failed to pass Movie via Intent</string>
 
 
     <!-- - - - - - - - - - - - - - - -
@@ -69,7 +77,8 @@
       - - - - - - - - - - - - - - - -->
 
     <string name="favorite_button" translatable="true">Mark as favorite</string>
-    <string name="avaible_trailer">Found:</string>
+    <string name="share_button" translatable="true">Share First Trailer</string>
+    <string name="available_trailer">Click to play:</string>
     <string name="youtube_button" translatable="true">Watch on Youtube</string>
     <string name="movie_details_key" translatable="false">movieDetails</string>
 </resources>
